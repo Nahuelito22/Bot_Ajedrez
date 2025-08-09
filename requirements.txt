@@ -1,0 +1,18 @@
+# === Backend / API ===
+# Framework para construir la API y servidor para correrla.
+fastapi
+uvicorn[standard]
+
+# === Inteligencia Artificial ===
+tensorflow-cpu
+numpy
+pandas
+
+# === Lógica de Ajedrez ===
+python-chess
+
+# === Utilidades de Desarrollo ===
+# Para convertir tus notebooks a scripts .py y experimentar.
+jupyterlab
+notebook
+python-dotenv
