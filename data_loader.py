@@ -1,22 +1,22 @@
+# data_loader.py (Versión Final Eficiente)
+
 import pickle
 import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import random
 
 def cargar_artefactos_entrenamiento(base_path):
-    """Carga los artefactos necesarios para el entrenamiento desde archivos.
+    """
+    Carga los artefactos necesarios para el entrenamiento desde archivos.
 
-    Lee el tokenizador, las secuencias de movimientos y la matriz de embedding
-    pre-entrenada desde los archivos especificados.
+    Lee el tokenizador y las secuencias de movimientos. La matriz de embedding
+    se cargará por separado en el script de entrenamiento donde se necesita.
 
     Args:
-        base_path (str): La ruta base donde se encuentran los archivos
-                         'tokenizer.pkl', 'sequences.pkl' y 'embedding_matrix.npy'.
+        base_path (str): La ruta base donde se encuentran 'tokenizer.pkl' y 'sequences.pkl'.
 
     Returns:
-        tuple: Una tupla conteniendo:
-            - tokenizer (keras.preprocessing.text.Tokenizer): El tokenizador cargado.
-            - sequences (list): La lista de secuencias de movimientos.
-            - embedding_matrix (np.ndarray): La matriz de embedding.
+        tuple: Una tupla conteniendo (tokenizer, sequences).
     """
     print("Cargando artefactos de entrenamiento...")
     with open(f"{base_path}/tokenizer.pkl", "rb") as f:
@@ -25,73 +25,40 @@ def cargar_artefactos_entrenamiento(base_path):
     with open(f"{base_path}/sequences.pkl", "rb") as f:
         sequences = pickle.load(f)
 
-    embedding_matrix = np.load(f"{base_path}/embedding_matrix.npy")
-
     print("✅ Artefactos cargados.")
-    return tokenizer, sequences, embedding_matrix
+    return tokenizer, sequences
 
-def crear_pares_entrenamiento(sequences):
-    """Transforma una lista de secuencias en pares de entrada (X) y salida (y).
-
-    Para cada secuencia en la lista, genera múltiples ejemplos de entrenamiento.
-    Por ejemplo, la secuencia [a, b, c] generará los pares:
-    - X=[a], y=b
-    - X=[a, b], y=c
-
-    Este es un paso de pre-procesamiento que se realiza una sola vez para
-    acelerar el entrenamiento en cada época.
-
-    Args:
-        sequences (list): Una lista de listas, donde cada sublista es una secuencia
-                          de tokens (movimientos).
-
-    Returns:
-        tuple: Una tupla conteniendo:
-            - X (list): Una lista de secuencias de entrada.
-            - y (list): Una lista de etiquetas de salida correspondientes.
+def generate_batches_eficiente(sequences, batch_size, max_sequence_length):
     """
-    X, y = [], []
-    for seq in sequences:
-        for i in range(1, len(seq)):
-            X.append(seq[:i])
-            y.append(seq[i])
-    return X, y
-
-def generate_batches(X, y, batch_size, max_sequence_length):
-    """Generador que crea lotes de datos para el entrenamiento de forma eficiente.
-
-    Toma los pares de (X, y) pre-procesados, los mezcla y los divide en lotes
-    del tamaño especificado. Aplica padding a las secuencias de entrada (X) de
-    cada lote justo antes de entregarlo.
+    Generador que crea lotes de datos para el entrenamiento de forma eficiente,
+    procesando las secuencias "al vuelo" para no consumir toda la RAM.
 
     Args:
-        X (list): La lista completa de secuencias de entrada.
-        y (list): La lista completa de etiquetas de salida.
+        sequences (list): La lista completa de secuencias de movimientos.
         batch_size (int): El número de muestras por lote.
-        max_sequence_length (int): La longitud máxima a la que se deben rellenar
-                                   (pad) las secuencias de entrada.
+        max_sequence_length (int): La longitud máxima para el padding.
 
     Yields:
-        tuple: Una tupla conteniendo (X_batch, y_batch):
-            - X_batch (np.ndarray): Un lote de secuencias de entrada, con padding
-                                    y con forma (batch_size, max_sequence_length).
-            - y_batch (np.ndarray): Un lote de etiquetas de salida, con forma
-                                    (batch_size,).
+        tuple: Una tupla (X_batch, y_batch) lista para el entrenamiento.
     """
-    num_samples = len(X)
-    # Mezclar los datos al inicio de cada época para mejorar el aprendizaje
-    indices = np.arange(num_samples)
-    np.random.shuffle(indices)
+    # Usamos un bucle infinito para que el generador pueda usarse en múltiples épocas
+    while True:
+        # Mezclar las secuencias al inicio de cada pasada completa sobre los datos
+        random.shuffle(sequences)
 
-    for start_idx in range(0, num_samples, batch_size):
-        end_idx = min(start_idx + batch_size, num_samples)
-        batch_indices = indices[start_idx:end_idx]
+        X_batch, y_batch = [], []
 
-        # Extraer el lote usando los índices mezclados
-        X_batch = [X[i] for i in batch_indices]
-        y_batch = [y[i] for i in batch_indices]
+        # Iteramos sobre cada partida (secuencia)
+        for seq in sequences:
+            # Creamos los pares de (entrada, salida) para esa partida
+            for i in range(1, len(seq)):
+                X_batch.append(seq[:i])
+                y_batch.append(seq[i])
 
-        # Aplicar padding solo al lote actual
-        X_padded = pad_sequences(X_batch, maxlen=max_sequence_length, padding='post')
-
-        yield np.array(X_padded), np.array(y_batch)
+                # Cuando juntamos suficientes muestras para un lote, lo procesamos y entregamos
+                if len(X_batch) == batch_size:
+                    X_padded = pad_sequences(X_batch, maxlen=max_sequence_length, padding='post')
+                    yield np.array(X_padded), np.array(y_batch)
+                    
+                    # Limpiamos las listas para el siguiente lote
+                    X_batch, y_batch = [], []

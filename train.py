@@ -1,98 +1,88 @@
-# 1. Imports de librerías y módulos
+# train.py (Versión Final para Generador Eficiente)
+
 import os
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
+import argparse
+import numpy as np
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 from model import crear_modelo_rnn
-from data_loader import (
-                         cargar_artefactos_entrenamiento,
-                         crear_pares_entrenamiento,
-                         generate_batches)
+from data_loader import cargar_artefactos_entrenamiento, generate_batches_eficiente
 
-# 2. Constantes y Configuración
-BASE_PATH = "."  # Asumimos que los datos están en el directorio actual
-CHECKPOINT_DIR = os.path.join(BASE_PATH, "checkpoints")
-LOG_FILE = os.path.join(BASE_PATH, "historial_entrenamiento.csv")
-FINAL_MODEL_PATH = os.path.join(BASE_PATH, "chess_lstm_model_final.keras")
+# --- Argumentos y Rutas ---
+parser = argparse.ArgumentParser(description="Entrenar el modelo de ajedrez LSTM.")
+parser.add_argument(
+    '--data_path',
+    type=str,
+    required=True,
+    help='Ruta a la carpeta que contiene los datos y donde se guardarán los resultados.'
+)
+args = parser.parse_args()
+DATA_PATH = args.data_path
 
-EPOCHS = 25  # Aumentamos las épocas, EarlyStopping se encargará de parar si es necesario
-BATCH_SIZE = 128
+# --- Constantes y Configuración ---
+CHECKPOINT_DIR = os.path.join(DATA_PATH, "checkpoints")
+FINAL_MODEL_PATH = os.path.join(DATA_PATH, "chess_lstm_model_final.keras")
+
+EPOCHS = 25
+BATCH_SIZE = 512 # Un batch size más pequeño funciona bien con generadores
 MAX_SEQUENCE_LENGTH = 50
-VALIDATION_SPLIT = 0.1 # Usaremos un 10% de los datos para validación
 
 # Crear directorio para checkpoints si no existe
 if not os.path.exists(CHECKPOINT_DIR):
     os.makedirs(CHECKPOINT_DIR)
 
-# 3. Lógica Principal de Entrenamiento
+# --- Lógica Principal de Entrenamiento ---
 if __name__ == "__main__":
-    # --- Paso 1: Cargar y Preparar los Datos ---
-    print("--- Cargando y preparando datos ---")
-    tokenizer, sequences, embedding_matrix = cargar_artefactos_entrenamiento(BASE_PATH)
+    # --- Paso 1: Cargar los Datos ---
+    print(f"--- Cargando datos desde: {DATA_PATH} ---")
+    tokenizer, sequences = cargar_artefactos_entrenamiento(DATA_PATH)
+    embedding_matrix = np.load(os.path.join(DATA_PATH, "embedding_matrix.npy"))
+
+    # --- Paso 2: Calcular Parámetros ---
+    # Calculamos el número total de muestras que el generador producirá en una época
+    total_samples = sum(len(seq) - 1 for seq in sequences)
+    steps_per_epoch = total_samples // BATCH_SIZE
+    if steps_per_epoch == 0:
+        steps_per_epoch = 1 # Asegurarse de que haya al menos un paso
     
-    # Crear todos los pares (X, y) una sola vez
-    X, y = crear_pares_entrenamiento(sequences)
+    print(f"Se generarán aproximadamente {total_samples} muestras en total.")
+    print(f"Con un tamaño de lote de {BATCH_SIZE}, se realizarán {steps_per_epoch} pasos por época.")
 
-    # Dividir en conjuntos de entrenamiento y validación
-    X_train, X_val, y_train, y_val = train_test_split(
-        X, y, test_size=VALIDATION_SPLIT, random_state=42
-    )
-    print(f"Datos de entrenamiento: {len(X_train)} muestras")
-    print(f"Datos de validación: {len(y_val)} muestras")
-
-    # --- Paso 2: Crear el Modelo ---
+    # --- Paso 3: Crear el Modelo ---
     vocab_size = len(tokenizer.word_index) + 1
     embedding_dim = embedding_matrix.shape[1]
     model = crear_modelo_rnn(vocab_size, embedding_dim, MAX_SEQUENCE_LENGTH, embedding_matrix)
 
-    # --- Paso 3: Configurar Callbacks ---
+    # --- Paso 4: Configurar Callbacks ---
     print("--- Configurando Callbacks ---")
-    # Guarda el mejor modelo basado en la pérdida de validación
-    checkpoint_path = os.path.join(CHECKPOINT_DIR, "mejor_modelo_epoch_{epoch:02d}-val_loss_{val_loss:.2f}.keras")
+    # Guarda un checkpoint después de cada época
+    checkpoint_path = os.path.join(CHECKPOINT_DIR, "modelo_epoch_{epoch:02d}.keras")
     model_checkpoint = ModelCheckpoint(
         filepath=checkpoint_path,
-        save_best_only=True,
-        monitor='val_loss',
-        mode='min',
+        save_best_only=False, # Guardamos cada época por si queremos reanudar
         verbose=1
     )
 
-    # Registra el historial de entrenamiento en un archivo CSV
-    csv_logger = CSVLogger(LOG_FILE)
-
-    # Detiene el entrenamiento si no hay mejora
+    # Detiene el entrenamiento si la pérdida no mejora
     early_stopping = EarlyStopping(
-        monitor='val_loss',
-        patience=3, # Número de épocas sin mejora antes de parar
+        monitor='loss', # Monitoreamos la pérdida de entrenamiento
+        patience=3,
         verbose=1,
-        mode='min',
-        restore_best_weights=True # Restaura los pesos del mejor modelo al final
+        restore_best_weights=True
     )
 
-    # --- Paso 4: Crear Generadores de Datos ---
-    train_generator = generate_batches(X_train, y_train, BATCH_SIZE, MAX_SEQUENCE_LENGTH)
-    val_generator = generate_batches(X_val, y_val, BATCH_SIZE, MAX_SEQUENCE_LENGTH)
+    # --- Paso 5: Crear el Generador y Entrenar ---
+    train_generator = generate_batches_eficiente(sequences, BATCH_SIZE, MAX_SEQUENCE_LENGTH)
 
-    # Calcular los pasos por época
-    steps_per_epoch = len(X_train) // BATCH_SIZE
-    validation_steps = len(X_val) // BATCH_SIZE
-    if steps_per_epoch == 0: steps_per_epoch = 1
-    if validation_steps == 0: validation_steps = 1
-
-    # --- Paso 5: Iniciar el Entrenamiento ---
     print("\n--- Iniciando Entrenamiento ---")
-    history = model.fit(
+    model.fit(
         train_generator,
         epochs=EPOCHS,
         steps_per_epoch=steps_per_epoch,
-        validation_data=val_generator,
-        validation_steps=validation_steps,
-        callbacks=[model_checkpoint, csv_logger, early_stopping],
+        callbacks=[model_checkpoint, early_stopping],
         verbose=1
     )
 
     # --- Paso 6: Guardar el Modelo Final ---
-    # El callback EarlyStopping con `restore_best_weights=True` ya ha restaurado
-    # los mejores pesos en el modelo, por lo que guardamos el estado óptimo.
     model.save(FINAL_MODEL_PATH)
     print(f"\n✅ Entrenamiento completado. Modelo final guardado en '{FINAL_MODEL_PATH}'")
