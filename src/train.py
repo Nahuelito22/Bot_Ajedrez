@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
-from model import crear_modelo_rnn
+from src.model import crear_modelo_rnn
 from data_loader import cargar_artefactos_entrenamiento, generate_batches_eficiente
 
 # --- Argumentos ---
