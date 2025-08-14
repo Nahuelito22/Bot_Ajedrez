@@ -17,8 +17,6 @@ var isAiThinking = false;
 async function getAiMove() {
   isAiThinking = true;
   statusEl.innerHTML = "El bot está pensando...";
-  console.log("--- INTENTANDO OBTENER JUGADA DE LA IA ---");
-  console.log("Estado del juego (FEN) antes de la llamada:", game.fen());
 
   try {
     const response = await fetch(API_URL, {
@@ -32,26 +30,31 @@ async function getAiMove() {
     }
 
     const data = await response.json();
-    const botMove = data.bot_move;
-    console.log("IA responde con la jugada:", botMove);
+    const botMoves = data.bot_moves; // Ahora recibimos una lista de jugadas
+    console.log("La IA propone (en orden):", botMoves);
 
-    // --- PUNTO CRÍTICO DE DEPURACIÓN ---
-    console.log("Intentando ejecutar game.move('" + botMove + "')");
-    var moveResult = game.move(botMove);
-
-    // Verificamos qué devolvió la función move
-    if (moveResult === null) {
-      console.error("¡ERROR! chess.js rechazó la jugada:", botMove);
-      console.log("Lista de movimientos legales posibles según chess.js:", game.moves());
-    } else {
-      console.log("¡ÉXITO! La jugada fue aceptada por chess.js.");
+    // --- BUCLE DE PLAN B ---
+    // Intentamos cada jugada que nos dio el bot, en orden, hasta que una sea legal.
+    var moveMade = false;
+    for (const move of botMoves) {
+        if (game.move(move)) {
+            console.log("Jugada legal encontrada y ejecutada:", move);
+            board.position(game.fen());
+            moveMade = true;
+            break; // Salimos del bucle en cuanto encontramos una jugada válida
+        } else {
+            console.warn("La jugada propuesta '" + move + "' fue ilegal o inválida. Intentando la siguiente.");
+        }
     }
-    
-    board.position(game.fen());
-    console.log("Estado del juego (FEN) después de la jugada:", game.fen());
+
+    if (!moveMade) {
+        console.error("¡ERROR! Ninguna de las 3 jugadas propuestas por la IA fue legal.");
+    }
+    // ----------------------
 
   } catch (error) {
-    console.error("Error en la comunicación con la IA:", error);
+    console.error("Error al obtener la jugada del bot:", error);
+    statusEl.innerHTML = "Error al conectar con la IA.";
   } finally {
     isAiThinking = false;
     updateStatus();
