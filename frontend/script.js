@@ -64,7 +64,9 @@ function updateStatus () {
 var config = {
   draggable: true,
   position: 'start',
-  pieceTheme: 'https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/img/chesspieces/wikipedia/{piece}.png',
+  // --- ESTA ES LA LÍNEA QUE CAMBIA ---
+  // Ahora apunta a nuestra carpeta local de imágenes
+  pieceTheme: 'img/chesspieces/wikipedia/{piece}.png',
   onDragStart: onDragStart,
   onDrop: onDrop,
   onSnapEnd: onSnapEnd
