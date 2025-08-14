@@ -1,0 +1,14 @@
+/* Centra todo el contenido de la página */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    background-color: #f0f0f0; /* Un fondo suave */
+}
+
+/* Define el tamaño del tablero */
+#miTablero {
+    width: 40vw; /* El tablero ocupará el 40% del ancho de la ventana */
+    max-width: 500px; /* Pero como máximo, medirá 500px */
+}
