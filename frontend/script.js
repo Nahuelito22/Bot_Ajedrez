@@ -1,36 +1,31 @@
-// script.js (Con bot que juega al azar)
+// script.js (Con Interfaz de Usuario)
 
 // --- 1. VARIABLES GLOBALES ---
 var board = null;
 var game = new Chess();
+// Referencias a los nuevos elementos del HTML
+var statusEl = document.getElementById('status');
+var pgnEl = document.getElementById('pgn');
 
 // --- 2. FUNCIONES DE LÓGICA DEL JUEGO ---
 
-// Función para que la computadora haga un movimiento aleatorio
 function makeRandomMove () {
   var possibleMoves = game.moves();
-
-  // Si el juego terminó, no hacer nada
   if (game.game_over()) return;
 
-  // Elegir un movimiento al azar de la lista de movimientos legales
   var randomIdx = Math.floor(Math.random() * possibleMoves.length);
   game.move(possibleMoves[randomIdx]);
   
-  // Actualizar el tablero visual con el movimiento de la IA
   board.position(game.fen());
-
   updateStatus();
 }
 
 function onDragStart (source, piece, position, orientation) {
   if (game.game_over()) return false;
-  // Solo permitir mover piezas blancas
   if (piece.search(/^b/) !== -1) return false;
 }
 
 function onDrop (source, target) {
-  // Ver si el movimiento del humano es legal
   var move = game.move({
     from: source,
     to: target,
@@ -40,8 +35,6 @@ function onDrop (source, target) {
   if (move === null) return 'snapback';
 
   updateStatus();
-
-  // Le damos 250 milisegundos a la computadora para "pensar" y responder
   window.setTimeout(makeRandomMove, 250);
 }
 
@@ -69,7 +62,9 @@ function updateStatus () {
     }
   }
   
-  console.log(status);
+  // Actualizamos el contenido de los párrafos en el HTML
+  statusEl.innerHTML = status;
+  pgnEl.innerHTML = game.pgn();
 }
 
 // --- 3. CONFIGURACIÓN E INICIALIZACIÓN DEL TABLERO ---
@@ -84,3 +79,10 @@ var config = {
 
 board = Chessboard('miTablero', config);
 updateStatus();
+
+// --- 4. LÓGICA DE LOS BOTONES ---
+document.getElementById('resetButton').addEventListener('click', function() {
+    game.reset();
+    board.start();
+    updateStatus();
+});
