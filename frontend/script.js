@@ -12,10 +12,13 @@ var isAiThinking = false;
 
 
 // --- 2. FUNCIONES DE LÓGICA DEL JUEGO ---
+// Reemplaza solo esta función en tu script.js
+
 async function getAiMove() {
-  // Activamos el "interruptor" para bloquear al jugador
   isAiThinking = true;
   statusEl.innerHTML = "El bot está pensando...";
+  console.log("--- INTENTANDO OBTENER JUGADA DE LA IA ---");
+  console.log("Estado del juego (FEN) antes de la llamada:", game.fen());
 
   try {
     const response = await fetch(API_URL, {
@@ -25,18 +28,31 @@ async function getAiMove() {
     });
 
     if (!response.ok) {
-      throw new Error(`Error del servidor: ${response.statusText}`);
+        throw new Error(`Error del servidor: ${response.statusText}`);
     }
 
     const data = await response.json();
-    game.move(data.bot_move);
+    const botMove = data.bot_move;
+    console.log("IA responde con la jugada:", botMove);
+
+    // --- PUNTO CRÍTICO DE DEPURACIÓN ---
+    console.log("Intentando ejecutar game.move('" + botMove + "')");
+    var moveResult = game.move(botMove);
+
+    // Verificamos qué devolvió la función move
+    if (moveResult === null) {
+      console.error("¡ERROR! chess.js rechazó la jugada:", botMove);
+      console.log("Lista de movimientos legales posibles según chess.js:", game.moves());
+    } else {
+      console.log("¡ÉXITO! La jugada fue aceptada por chess.js.");
+    }
+    
     board.position(game.fen());
+    console.log("Estado del juego (FEN) después de la jugada:", game.fen());
 
   } catch (error) {
-    console.error("Error al obtener la jugada del bot:", error);
-    statusEl.innerHTML = "Error al conectar con la IA. ¿El servidor está corriendo?";
+    console.error("Error en la comunicación con la IA:", error);
   } finally {
-    // Apagamos el "interruptor" para desbloquear al jugador
     isAiThinking = false;
     updateStatus();
   }
