@@ -1,4 +1,4 @@
-// script.js (Versión Corregida con bloqueo de tablero)
+// script.js (Versión Final Definitiva y Robusta)
 
 // --- 1. VARIABLES GLOBALES ---
 var board = null;
@@ -7,12 +7,10 @@ var statusEl = document.getElementById('status');
 var pgnEl = document.getElementById('pgn');
 const API_URL = "http://127.0.0.1:8000/predict_move";
 
-// --- NUEVA VARIABLE DE CONTROL ---
 var isAiThinking = false;
 
 
 // --- 2. FUNCIONES DE LÓGICA DEL JUEGO ---
-// Reemplaza solo esta función en tu script.js
 
 async function getAiMove() {
   isAiThinking = true;
@@ -30,7 +28,7 @@ async function getAiMove() {
     }
 
     const data = await response.json();
-    const botMoves = data.bot_moves; // Ahora recibimos una lista de jugadas
+    const botMoves = data.bot_moves; // Recibimos una lista de jugadas
     console.log("La IA propone (en orden):", botMoves);
 
     // --- BUCLE DE PLAN B ---
@@ -47,10 +45,17 @@ async function getAiMove() {
         }
     }
 
+    // --- PLAN C: SI NINGUNA JUGADA DE LA IA FUE LEGAL ---
     if (!moveMade) {
-        console.error("¡ERROR! Ninguna de las 3 jugadas propuestas por la IA fue legal.");
+        console.error("¡PLAN C ACTIVADO! La IA no dio jugadas legales. Jugando al azar.");
+        var possibleMoves = game.moves();
+        if (possibleMoves.length > 0) {
+            var randomIdx = Math.floor(Math.random() * possibleMoves.length);
+            game.move(possibleMoves[randomIdx]);
+            board.position(game.fen());
+        }
     }
-    // ----------------------
+    // ---------------------------------------------------
 
   } catch (error) {
     console.error("Error al obtener la jugada del bot:", error);
@@ -62,7 +67,6 @@ async function getAiMove() {
 }
 
 function onDragStart (source, piece, position, orientation) {
-  // --- LÍNEA MODIFICADA ---
   // No permitir mover si el juego terminó, no es tu turno, O SI LA IA ESTÁ PENSANDO
   if (game.game_over() || game.turn() !== 'w' || isAiThinking) {
     return false;
