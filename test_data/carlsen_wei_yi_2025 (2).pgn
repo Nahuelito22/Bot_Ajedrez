@@ -1,0 +1,19 @@
+[Event "Norway Chess Armageddon"]
+[Site "Stavanger NOR"]
+[Date "2025.05.28"]
+[EventDate "2025.05.26"]
+[Round "3.2"]
+[Result "0-1"]
+[White "Magnus Carlsen"]
+[Black "Yi Wei"]
+[ECO "A45"]
+[WhiteElo "2837"]
+[BlackElo "2758"]
+[PlyCount "64"]
+
+1. d4 Nf6 2. Bf4 g6 3. Nc3 d5 4. e3 Bg7 5. h4 h5 6. Nf3 O-O 7. Ne5 c5 8. Qd2 Bf5
+9. f3 cxd4 10. exd4 Nc6 11. Bb5 Nxe5 12. dxe5 Nd7 13. Bxd7 Qxd7 14. O-O-O Rac8
+15. Qxd5 Rxc3 16. Qxd7 Rxc2+ 17. Kb1 Rxg2+ 18. Qxf5 gxf5 19. Rd7 Rc8 20. Rxe7
+Rc4 21. Bc1 b5 22. Rd1 Rxh4 23. Rd8+ Kh7 24. Rxf7 Rh1 25. Rxf5 Kg6 26. Rf4 Rgg1
+27. Rd6+ Kh7 28. a4 Rxc1+ 29. Ka2 Bxe5 30. Rf7+ Kg8 31. Rdd7 bxa4 32. Ka3 Rc4 0-1
+

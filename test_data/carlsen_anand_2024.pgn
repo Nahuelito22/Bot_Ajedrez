@@ -1,0 +1,19 @@
+[Event "Casablanca Chess 2024"]
+[Site "Casablanca MAR"]
+[Date "2024.05.18"]
+[EventDate "2024.05.18"]
+[Round "1"]
+[Result "1-0"]
+[White "Magnus Carlsen"]
+[Black "Viswanathan Anand"]
+[ECO "C52"]
+[WhiteElo "2830"]
+[BlackElo "2751"]
+[PlyCount "40"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. b4 Bxb4 5. c3 Ba5 6. O-O Qf6 7. d4 Nge7
+8. Bg5 Qd6 9. Qb3 O-O 10. Rd1 Bb6 {Starting position: Steinitz - Chigorin
+World Championship Match (1889), Havana CUB, Game 5} 11. Na3 Na5 12. Qa4
+Nec6 13. dxe5 Qc5 14. Rd5 Qxf2+ 15. Kh1 Qb2 16. Rb1 Qxa3 17. Qxa3 Nxc4
+18. Qa4 Ne3 19. Rxb6 Nxd5 20. Rxc6 1-0
+
