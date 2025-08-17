@@ -5,7 +5,7 @@ var board = null;
 var game = new Chess();
 var statusEl = document.getElementById('status');
 var pgnEl = document.getElementById('pgn');
-const API_URL = "http://127.0.0.1:8000/predict_move";
+const API_URL = "https://nahuelito22-bot-ajedrez.hf.space/predict_move";
 
 var isAiThinking = false;
 
