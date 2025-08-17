@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # --- 1. Carga del Modelo y Tokenizador ---
 print("Cargando modelo y tokenizador...")
 # Asegúrate de que esta ruta sea correcta dentro de tu proyecto
-MODEL_PATH = os.path.join("trained_models", "modelo_epoch_06.keras") 
+MODEL_PATH = os.path.join("trained_models", "modelo_epoch_07.keras") 
 TOKENIZER_PATH = os.path.join("trained_models", "tokenizer.pkl")
 MAX_SEQUENCE_LENGTH = 50
 
