@@ -1,27 +1,32 @@
-# uci_wrapper.py
+# uci_wrapper.py (Versión Final Corregida y Robusta)
 
 import sys
 import requests
 import chess
+import logging
 
 # --- CONFIGURACIÓN ---
-# La dirección de tu API de FastAPI que debe estar corriendo localmente
 API_URL = "http://127.0.0.1:8000/predict_move"
 ENGINE_NAME = "BotAjedrezLSTM_Nahu"
 ENGINE_AUTHOR = "Matias Nahuel Ghilardi Salinas"
-# --------------------
+
+# Configurar un log para depuración
+logging.basicConfig(filename="uci_wrapper.log", level=logging.DEBUG, filemode='w')
 
 def send_uci_response(message):
-    """Envía un mensaje a la interfaz gráfica (Cute Chess)."""
+    """Envía un mensaje a la interfaz gráfica y lo registra en el log."""
+    logging.debug(f"SENDING: {message}")
     sys.stdout.write(message + "\n")
     sys.stdout.flush()
 
 def main_loop():
     """Bucle principal que escucha los comandos UCI."""
     board = chess.Board()
+    history_san = [] # <<< Guardaremos el historial aquí
 
     while True:
         line = sys.stdin.readline().strip()
+        logging.debug(f"RECEIVED: {line}")
         if not line:
             continue
 
@@ -38,42 +43,38 @@ def main_loop():
 
         elif command == "ucinewgame":
             board.reset()
+            history_san = [] # <<< Limpiamos el historial para la nueva partida
 
         elif command == "position":
-            # Formato: position startpos moves e2e4 e7e5 ...
-            # Formato: position fen <fen_string> moves e2e4 ...
+            # --- LÓGICA DE POSICIÓN CORREGIDA ---
             board.reset()
+            history_san = [] # Limpiamos para reconstruir
+            
             moves_start_index = -1
             if "startpos" in parts:
-                moves_start_index = parts.index("startpos") + 2
-            elif "fen" in parts:
-                fen_parts = parts[parts.index("fen") + 1 : parts.index("moves") if "moves" in parts else len(parts)]
-                board.set_fen(" ".join(fen_parts))
                 if "moves" in parts:
                     moves_start_index = parts.index("moves") + 1
-
+            
             if moves_start_index != -1:
+                # Procesamos cada jugada, guardando su notación en el momento correcto
                 for move_uci in parts[moves_start_index:]:
                     try:
-                        board.push_uci(move_uci)
+                        move = chess.Move.from_uci(move_uci)
+                        if move in board.legal_moves:
+                            history_san.append(board.san(move))
+                            board.push(move)
                     except ValueError:
-                        pass # Ignorar movimientos ilegales en la línea de comandos
-
+                        pass
+        
         elif command == "go":
-            # Es nuestro turno de pensar.
-            # Convertimos el historial a notación SAN, que es lo que nuestra API espera.
-            history_san = [board.san(move) for move in board.move_stack]
-
             try:
-                # Hacemos la petición a nuestra API
+                # Ahora simplemente usamos el historial que ya construimos
                 response = requests.post(API_URL, json={"moves": history_san})
-                response.raise_for_status() # Lanza un error si la petición falla
+                response.raise_for_status()
                 
-                # Recibimos la lista de jugadas propuestas por el bot
                 suggested_moves = response.json().get("bot_moves", [])
-                
                 best_legal_move = None
-                # Probamos cada jugada hasta encontrar una legal
+                
                 for move_san in suggested_moves:
                     try:
                         move = board.parse_san(move_san)
@@ -81,22 +82,26 @@ def main_loop():
                             best_legal_move = move
                             break
                     except ValueError:
-                        # La jugada no es válida en formato SAN
                         continue
                 
-                # Si ninguna jugada de la IA fue legal, jugamos al azar como Plan C
-                if not best_legal_move:
+                if not best_legal_move and list(board.legal_moves):
                     best_legal_move = list(board.legal_moves)[0]
+                
+                if best_legal_move:
+                    send_uci_response(f"bestmove {best_legal_move.uci()}")
 
-                send_uci_response(f"bestmove {best_legal_move.uci()}")
-
-            except requests.exceptions.RequestException as e:
-                # Si la API falla, jugamos al azar para no perder la partida
-                move = list(board.legal_moves)[0]
-                send_uci_response(f"bestmove {move.uci()}")
+            except Exception as e:
+                logging.error(f"Error en el comando 'go': {e}")
+                if list(board.legal_moves):
+                    move = list(board.legal_moves)[0]
+                    send_uci_response(f"bestmove {move.uci()}")
 
         elif command == "quit":
+            logging.debug("Comando 'quit' recibido. Terminando.")
             break
 
 if __name__ == "__main__":
-    main_loop()
+    try:
+        main_loop()
+    except Exception as e:
+        logging.error(f"Error fatal en el bucle principal: {e}")
