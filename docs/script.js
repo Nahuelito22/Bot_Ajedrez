@@ -160,3 +160,27 @@ if (currentTheme) {
         document.body.classList.add('dark-theme');
     }
 }
+
+// --- NUEVO CÓDIGO PARA GUARDAR LA PARTIDA ---
+
+document.getElementById('savePgnButton').addEventListener('click', function() {
+    // Obtenemos el historial de la partida en formato PGN
+    const pgn = game.pgn();
+    
+    // Usamos la API del navegador para copiar el texto al portapapeles
+    navigator.clipboard.writeText(pgn).then(function() {
+        // Éxito: avisamos al usuario que se copió
+        const originalText = document.getElementById('savePgnButton').innerText;
+        document.getElementById('savePgnButton').innerText = '¡Copiado!';
+        
+        // Volvemos al texto original después de 2 segundos
+        setTimeout(function() {
+            document.getElementById('savePgnButton').innerText = originalText;
+        }, 2000);
+
+    }, function(err) {
+        // Error: por si falla el copiado
+        console.error('Error al copiar el PGN: ', err);
+        alert("No se pudo copiar la partida.");
+    });
+});
