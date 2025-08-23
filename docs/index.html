@@ -9,21 +9,20 @@
 </head>
 <body>
     <nav class="navbar">
-    <div class="nav-brand">Bot de Ajedrez LSTM</div>
-    <ul class="nav-links">
-        <li><a href="#jugar">Jugar</a></li>
-        <li><a href="#analisis">Análisis del Modelo</a></li>
-        <li><a href="#proyecto">Sobre el Proyecto</a></li>
-        <li><a href="https://github.com/Nahuelito22/Bot_Ajedrez" target="_blank">Código Fuente</a></li>
-        
-        <li>
-            <div class="theme-switch-wrapper">
-                <label class="theme-switch" for="checkbox">
-                    <input type="checkbox" id="checkbox" />
-                    <div class="slider round"></div>
-                </label>
-            </div>
-        </li>
+        <div class="nav-brand">Bot de Ajedrez LSTM</div>
+        <ul class="nav-links">
+            <li><a href="#jugar">Jugar</a></li>
+            <li><a href="#analisis">Análisis del Modelo</a></li>
+            <li><a href="#proyecto">Sobre el Proyecto</a></li>
+            <li><a href="https://github.com/Nahuelito22/Bot_Ajedrez" target="_blank">Código Fuente</a></li>
+            <li>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="checkbox">
+                        <input type="checkbox" id="checkbox" />
+                        <div class="slider round"></div>
+                    </label>
+                </div>
+            </li>
         </ul>
     </nav>
 
@@ -39,31 +38,24 @@
                     <h3>Historial (PGN)</h3>
                     <p id="pgn"></p>
                 </div>
-                <div class="theme-container">
-                    <h4>Estilo de Piezas:</h4>
-                    <button id="wikiButton">Wikipedia</button>
-                    <button id="alphaButton">Alpha</button>
-                    <button id="uscfButton">USCF</button>
-                </div>
                 <div class="action-buttons">
                     <button id="resetButton">Nueva Partida</button>
                     <button id="savePgnButton">Copiar Partida (PGN)</button>
+                    <button id="settingsButton">🎨 Ajustes</button> 
                 </div>
             </div>
         </div>
     </section>
 
     <section id="analisis" class="main-section">
-        <h2>Análisis de Rendimiento del Modelo</h2>
-        <p>Aquí se muestran los resultados del análisis estadístico y táctico del bot.</p>
         <div class="analysis-container">
             <div class="chart-container">
                 <h3>Rendimiento Promedio vs. Etapa del Juego</h3>
-                <img src="../notebooks/grafico_de_rendimiento.png" alt="Gráfico de Rendimiento Promedio">
+                <img src="grafico_rendimiento.png" alt="Gráfico de Rendimiento Promedio">
             </div>
             <div class="chart-container">
                 <h3>Calidad Táctica (Pérdida de Centipeones)</h3>
-                <img src="../notebooks\grafico_de_errores.png" alt="Gráfico de Pérdida de Centipeones">
+                <img src="grafico_errores.png" alt="Gráfico de Pérdida de Centipeones">
             </div>
         </div>
     </section>
@@ -74,19 +66,38 @@
             <div class="about-content">
                 <div class="about-section">
                     <h3>Inspiración</h3>
-                    <p>Este proyecto nace de la fascinación por el ajedrez y la inteligencia artificial...</p>
+                    <p>Este proyecto nace de la fascinación por el ajedrez y la inteligencia artificial. A diferencia de los motores tradicionales que se basan en el cálculo bruto, el objetivo era crear un bot que jugara con un estilo "humano", imitando la intuición y el reconocimiento de patrones de un jugador experimentado.</p>
                 </div>
                 <div class="about-section">
                     <h3>El Desafío Técnico</h3>
-                    <p>El cerebro del bot es una Red Neuronal Recurrente (LSTM) construida con TensorFlow y Keras...</p>
+                    <p>El cerebro del bot es una Red Neuronal Recurrente (LSTM) construida con TensorFlow y Keras. Fue entrenado sobre un dataset de 1 millón de partidas de jugadores de alto nivel (2000+ ELO). Se utilizaron técnicas de Procesamiento de Lenguaje Natural (NLP) para tratar cada partida como una "frase" y cada jugada como una "palabra", permitiendo al modelo aprender la gramática y el estilo del ajedrez de élite.</p>
                 </div>
                 <div class="about-section">
                     <h3>Entrega Final Coderhouse</h3>
-                    <p>Este bot de ajedrez fue desarrollado como el proyecto final para la carrera de Data Science de Coderhouse...</p>
+                    <p>Este bot de ajedrez fue desarrollado como el proyecto final para la carrera de Data Science de Coderhouse, aplicando los conocimientos adquiridos en Machine Learning, Deep Learning y despliegue de modelos.</p>
                 </div>
             </div>
         </div>
     </section>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Personalización del Tablero</h2>
+            <div class="setting-option">
+                <h3>Estilo de Piezas</h3>
+                <div class="preview-board" id="previewBoardPieces"></div>
+                <div class="options">
+                    <button class="theme-btn" data-theme="wikipedia">Wikipedia</button>
+                    <button class="theme-btn" data-theme="alpha">Alpha</button>
+                    <button class="theme-btn" data-theme="uscf">USCF</button>
+                </div>
+            </div>
+            <div class="setting-option">
+                <h3>Color del Tablero (Próximamente)</h3>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
