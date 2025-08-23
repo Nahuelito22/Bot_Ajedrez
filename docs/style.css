@@ -1,79 +1,149 @@
-/* Estilo General */
+/* Estilo General y Variables */
+:root {
+    --primary-bg: #f0f0f0;
+    --secondary-bg: #ffffff;
+    --text-color: #333;
+    --border-color: #ddd;
+}
+html {
+    scroll-behavior: smooth; /* Para el desplazamiento suave */
+}
 body {
     font-family: sans-serif;
-    background-color: #f0f0f0;
+    background-color: var(--primary-bg);
     margin: 0;
-    padding: 20px;
+    padding-top: 60px; /* Espacio para la navbar fija */
 }
 
-/* Contenedor principal que centra el título */
-.title-container {
-    text-align: center;
+/* Barra de Navegación */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    margin-bottom: 20px;
+    background-color: var(--secondary-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+.nav-brand {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+.nav-links li a {
+    display: block;
+    padding: 20px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: bold;
+}
+.nav-links li a:hover {
+    background-color: var(--primary-bg);
 }
 
-/* Contenedor principal del juego, ahora usa Flexbox en fila */
+/* Estructura de Secciones */
+.main-section {
+    padding: 40px 5%;
+    min-height: 80vh;
+}
+
+/* Sección de Juego */
 .game-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que los elementos se muevan hacia abajo en pantallas pequeñas */
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 30px; /* Espacio entre el tablero y la columna de información */
+    gap: 30px;
 }
-
-/* El tablero de ajedrez */
 #miTablero {
     width: 40vw;
     max-width: 500px;
-    min-width: 300px; /* Asegura un tamaño mínimo */
+    min-width: 300px;
 }
-
-/* La columna de la derecha para información y controles */
 .controls-container {
     display: flex;
     flex-direction: column;
     gap: 15px;
     width: 100%;
-    max-width: 300px; /* Ancho de la columna de la derecha */
+    max-width: 300px;
 }
-
-/* Estilo para las cajas de información */
 .info-box {
-    background-color: #fff;
+    background-color: var(--secondary-bg);
     padding: 10px 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
-.info-box h3 {
-    margin-top: 0;
-}
-
 #pgn {
     font-family: monospace;
     word-wrap: break-word;
-    max-height: 150px; /* Límite de altura con scroll */
+    max-height: 150px;
     overflow-y: auto;
 }
 
-/* Estilo para el contenedor de los temas */
+/* Sección de Análisis */
+.analysis-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.chart-container {
+    background-color: var(--secondary-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    flex: 1;
+    min-width: 400px;
+}
+.chart-container img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Sección Sobre el Proyecto */
+.about-container {
+    background-color: var(--secondary-bg);
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.about-container h2 {
+    text-align: center;
+    margin-top: 0;
+}
+.about-content {
+    display: flex;
+    gap: 20px;
+}
+.about-section {
+    flex: 1;
+}
+
+/* Estilos de botones (reutilizados) */
 .theme-container {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
-
-/* Estilo para los botones */
 button {
     padding: 8px 12px;
     border-radius: 6px;
-    border: 1px solid #ccc;
-    background-color: #fff;
+    border: 1px solid var(--border-color);
+    background-color: var(--secondary-bg);
     cursor: pointer;
     font-weight: bold;
 }
-
 button:hover {
     background-color: #e9e9e9;
 }

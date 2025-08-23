@@ -3,41 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot de Ajedrez LSTM</title>
-
+    <title>Bot de Ajedrez LSTM - Nahuel Ghilardi</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="title-container">
-        <h1>Bot de Ajedrez con IA</h1>
-    </div>
+    <nav class="navbar">
+        <div class="nav-brand">Bot de Ajedrez LSTM</div>
+        <ul class="nav-links">
+            <li><a href="#jugar">Jugar</a></li>
+            <li><a href="#analisis">Análisis del Modelo</a></li>
+            <li><a href="#proyecto">Sobre el Proyecto</a></li>
+            <li><a href="https://github.com/Nahuelito22/Bot_Ajedrez" target="_blank">Código Fuente</a></li>
+        </ul>
+    </nav>
 
-    <div class="game-container">
-        <div id="miTablero" style="width: 400px"></div>
-
-        <div class="controls-container">
-            <div class="info-box">
-                <h3>Estado del Juego</h3>
-                <p id="status"></p>
+    <section id="jugar" class="main-section">
+        <div class="game-container">
+            <div id="miTablero"></div>
+            <div class="controls-container">
+                <div class="info-box">
+                    <h3>Estado del Juego</h3>
+                    <p id="status"></p>
+                </div>
+                <div class="info-box">
+                    <h3>Historial (PGN)</h3>
+                    <p id="pgn"></p>
+                </div>
+                <div class="theme-container">
+                    <h4>Estilo de Piezas:</h4>
+                    <button id="wikiButton">Wikipedia</button>
+                    <button id="alphaButton">Alpha</button>
+                    <button id="uscfButton">USCF</button>
+                </div>
+                <button id="resetButton">Nueva Partida</button>
             </div>
-            
-            <div class="info-box">
-                <h3>Historial (PGN)</h3>
-                <p id="pgn"></p>
-            </div>
-            
-            <div class="theme-container">
-                <h4>Estilo de Piezas:</h4>
-                <button id="wikiButton">Wikipedia</button>
-                <button id="alphaButton">Alpha</button>
-                <button id="uscfButton">USCF</button>
-            </div>
-            
-            <button id="resetButton">Nueva Partida</button>
         </div>
-    </div>
+    </section>
+
+    <section id="analisis" class="main-section">
+        <h2>Análisis de Rendimiento del Modelo</h2>
+        <p>Aquí se muestran los resultados del análisis estadístico y táctico del bot.</p>
+        <div class="analysis-container">
+            <div class="chart-container">
+                <h3>Rendimiento Promedio vs. Etapa del Juego</h3>
+                <img src="ruta/a/tu/grafico_de_rendimiento.png" alt="Gráfico de Rendimiento Promedio">
+            </div>
+            <div class="chart-container">
+                <h3>Calidad Táctica (Pérdida de Centipeones)</h3>
+                <img src="ruta/a/tu/grafico_de_errores.png" alt="Gráfico de Pérdida de Centipeones">
+            </div>
+        </div>
+    </section>
+
+    <section id="proyecto" class="main-section">
+         <div class="about-container">
+            <h2>Sobre este Proyecto</h2>
+            <div class="about-content">
+                <div class="about-section">
+                    <h3>Inspiración</h3>
+                    <p>Este proyecto nace de la fascinación por el ajedrez y la inteligencia artificial...</p>
+                </div>
+                <div class="about-section">
+                    <h3>El Desafío Técnico</h3>
+                    <p>El cerebro del bot es una Red Neuronal Recurrente (LSTM) construida con TensorFlow y Keras...</p>
+                </div>
+                <div class="about-section">
+                    <h3>Entrega Final Coderhouse</h3>
+                    <p>Este bot de ajedrez fue desarrollado como el proyecto final para la carrera de Data Science de Coderhouse...</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
