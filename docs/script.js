@@ -120,9 +120,41 @@ var config = {
 board = Chessboard('miTablero', config);
 updateStatus();
 
-// --- 4. LÓGICA DE BOTONES ---
+// --- 4. LÓGICA DE LOS BOTONES ---
+
+// Botón para reiniciar la partida
 document.getElementById('resetButton').addEventListener('click', function() {
-  game.reset();
-  board.start();
-  updateStatus();
+    game.reset();
+    board.start();
+    updateStatus();
+});
+
+// --- NUEVO CÓDIGO PARA CAMBIAR EL TEMA ---
+
+/**
+ * Función que redibuja el tablero con un nuevo tema de piezas.
+ * @param {string} themeName - El nombre de la carpeta del tema (ej. 'wikipedia').
+ */
+function cambiarTema(themeName) {
+    // Obtenemos la configuración actual para no perder el estado del juego
+    var config = board.getConfig();
+    
+    // Actualizamos solo la ruta a las imágenes de las piezas
+    config.pieceTheme = `img/chesspieces/${themeName}/{piece}.png`;
+    
+    // Volvemos a crear el tablero con la nueva configuración
+    board = Chessboard('miTablero', config);
+}
+
+// Conectamos la función a los botones
+document.getElementById('wikiButton').addEventListener('click', function() {
+    cambiarTema('wikipedia');
+});
+
+document.getElementById('alphaButton').addEventListener('click', function() {
+    cambiarTema('alpha');
+});
+
+document.getElementById('uscfButton').addEventListener('click', function() {
+    cambiarTema('uscf');
 });

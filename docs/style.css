@@ -33,3 +33,24 @@ body {
     font-family: monospace;
     word-wrap: break-word;
 }
+
+/* (agregar al final de style.css) */
+
+.theme-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #e9e9e9;
+}
