@@ -1,47 +1,70 @@
-/* Centra todo el contenido de la página */
+/* Estilo General */
 body {
-    display: flex;
-    justify-content: center;
     font-family: sans-serif;
     background-color: #f0f0f0;
+    margin: 0;
     padding: 20px;
 }
 
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px; /* Espacio entre elementos */
+/* Contenedor principal que centra el título */
+.title-container {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
-/* Define el tamaño del tablero */
+/* Contenedor principal del juego, ahora usa Flexbox en fila */
+.game-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos se muevan hacia abajo en pantallas pequeñas */
+    justify-content: center;
+    gap: 30px; /* Espacio entre el tablero y la columna de información */
+}
+
+/* El tablero de ajedrez */
 #miTablero {
     width: 40vw;
     max-width: 500px;
+    min-width: 300px; /* Asegura un tamaño mínimo */
 }
 
-.info-container {
+/* La columna de la derecha para información y controles */
+.controls-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     width: 100%;
-    max-width: 500px;
+    max-width: 300px; /* Ancho de la columna de la derecha */
+}
+
+/* Estilo para las cajas de información */
+.info-box {
     background-color: #fff;
     padding: 10px 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.info-box h3 {
+    margin-top: 0;
+}
+
 #pgn {
     font-family: monospace;
     word-wrap: break-word;
+    max-height: 150px; /* Límite de altura con scroll */
+    overflow-y: auto;
 }
 
-/* (agregar al final de style.css) */
-
+/* Estilo para el contenedor de los temas */
 .theme-container {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
+/* Estilo para los botones */
 button {
     padding: 8px 12px;
     border-radius: 6px;

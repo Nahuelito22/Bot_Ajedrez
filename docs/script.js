@@ -1,56 +1,40 @@
-// script.js (Versión Final Definitiva y Robusta)
+// script.js (Versión Final Corregida)
 
 // --- 1. VARIABLES GLOBALES ---
 var board = null;
 var game = new Chess();
 var statusEl = document.getElementById('status');
 var pgnEl = document.getElementById('pgn');
-
-// Api URL del bot de ajedrez
-// const API_URL = "https://nahuelito22-bot-ajedrez.hf.space/predict_move";
-
-// Api URL del bot de ajedrez (local para pruebas)
 const API_URL = "http://127.0.0.1:8000/predict_move";
-
 var isAiThinking = false;
 
-
 // --- 2. FUNCIONES DE LÓGICA DEL JUEGO ---
-
 async function getAiMove() {
   isAiThinking = true;
   statusEl.innerHTML = "El bot está pensando...";
-
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ moves: game.history() }),
     });
-
     if (!response.ok) {
         throw new Error(`Error del servidor: ${response.statusText}`);
     }
-
     const data = await response.json();
-    const botMoves = data.bot_moves; // Recibimos una lista de jugadas
+    const botMoves = data.bot_moves;
     console.log("La IA propone (en orden):", botMoves);
-
-    // --- BUCLE DE PLAN B ---
-    // Intentamos cada jugada que nos dio el bot, en orden, hasta que una sea legal.
     var moveMade = false;
     for (const move of botMoves) {
         if (game.move(move)) {
             console.log("Jugada legal encontrada y ejecutada:", move);
             board.position(game.fen());
             moveMade = true;
-            break; // Salimos del bucle en cuanto encontramos una jugada válida
+            break;
         } else {
             console.warn("La jugada propuesta '" + move + "' fue ilegal o inválida. Intentando la siguiente.");
         }
     }
-
-    // --- PLAN C: SI NINGUNA JUGADA DE LA IA FUE LEGAL ---
     if (!moveMade) {
         console.error("¡PLAN C ACTIVADO! La IA no dio jugadas legales. Jugando al azar.");
         var possibleMoves = game.moves();
@@ -60,8 +44,6 @@ async function getAiMove() {
             board.position(game.fen());
         }
     }
-    // ---------------------------------------------------
-
   } catch (error) {
     console.error("Error al obtener la jugada del bot:", error);
     statusEl.innerHTML = "Error al conectar con la IA.";
@@ -72,7 +54,6 @@ async function getAiMove() {
 }
 
 function onDragStart (source, piece, position, orientation) {
-  // No permitir mover si el juego terminó, no es tu turno, O SI LA IA ESTÁ PENSANDO
   if (game.game_over() || game.turn() !== 'w' || isAiThinking) {
     return false;
   }
@@ -81,7 +62,6 @@ function onDragStart (source, piece, position, orientation) {
 async function onDrop (source, target) {
   var move = game.move({ from: source, to: target, promotion: 'q' });
   if (move === null) return 'snapback';
-
   updateStatus();
   window.setTimeout(getAiMove, 250);
 }
@@ -96,7 +76,6 @@ function updateStatus () {
   if (game.turn() === 'b') {
     moveColor = 'Negras';
   }
-
   if (game.in_checkmate()) {
     status = 'Juego Terminado, ' + moveColor + ' en Jaque Mate.';
   } else if (game.in_draw()) {
@@ -107,12 +86,11 @@ function updateStatus () {
       status += ', ' + moveColor + ' están en Jaque.';
     }
   }
-  
   statusEl.innerHTML = status;
   pgnEl.innerHTML = game.pgn();
 }
 
-// --- 3. CONFIGURACIÓN E INICIALIZACIÓN ---
+// --- 3. CONFIGURACIÓN E INICIALIZACIÓN DEL TABLERO ---
 var config = {
   draggable: true,
   position: 'start',
@@ -121,45 +99,36 @@ var config = {
   onDrop: onDrop,
   onSnapEnd: onSnapEnd
 };
-
 board = Chessboard('miTablero', config);
 updateStatus();
 
 // --- 4. LÓGICA DE LOS BOTONES ---
-
-// Botón para reiniciar la partida
 document.getElementById('resetButton').addEventListener('click', function() {
-    game.reset();
-    board.start();
-    updateStatus();
+  game.reset();
+  board.start();
+  updateStatus();
 });
 
-// --- NUEVO CÓDIGO PARA CAMBIAR EL TEMA ---
-
-/**
- * Función que redibuja el tablero con un nuevo tema de piezas.
- * @param {string} themeName - El nombre de la carpeta del tema (ej. 'wikipedia').
- */
 function cambiarTema(themeName) {
-    // Obtenemos la configuración actual para no perder el estado del juego
-    var config = board.getConfig();
-    
-    // Actualizamos solo la ruta a las imágenes de las piezas
-    config.pieceTheme = `img/chesspieces/${themeName}/{piece}.png`;
-    
-    // Volvemos a crear el tablero con la nueva configuración
-    board = Chessboard('miTablero', config);
+  // Para cambiar el tema, creamos una nueva configuración
+  // y re-inicializamos el tablero. Usamos game.fen() para mantener la posición.
+  var newConfig = {
+      draggable: true,
+      position: game.fen(), // <-- Mantiene la posición actual de la partida
+      pieceTheme: `img/chesspieces/${themeName}/{piece}.png`,
+      onDragStart: onDragStart,
+      onDrop: onDrop,
+      onSnapEnd: onSnapEnd
+  };
+  board = Chessboard('miTablero', newConfig);
 }
 
-// Conectamos la función a los botones
 document.getElementById('wikiButton').addEventListener('click', function() {
-    cambiarTema('wikipedia');
+  cambiarTema('wikipedia');
 });
-
 document.getElementById('alphaButton').addEventListener('click', function() {
-    cambiarTema('alpha');
+  cambiarTema('alpha');
 });
-
 document.getElementById('uscfButton').addEventListener('click', function() {
-    cambiarTema('uscf');
+  cambiarTema('uscf');
 });
