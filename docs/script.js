@@ -132,3 +132,31 @@ document.getElementById('alphaButton').addEventListener('click', function() {
 document.getElementById('uscfButton').addEventListener('click', function() {
   cambiarTema('uscf');
 });
+
+
+// --- 5. LÓGICA PARA EL CAMBIO DE TEMA (DARK/LIGHT MODE) ---
+
+const toggleSwitch = document.querySelector('#checkbox');
+
+// Función que cambia el tema
+function switchTheme(e) {
+    if (e.target.checked) {
+        document.body.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark'); // Guardamos la preferencia
+    } else {
+        document.body.classList.remove('dark-theme');
+        localStorage.setItem('theme', 'light'); // Guardamos la preferencia
+    }    
+}
+
+// Event listener para el interruptor
+toggleSwitch.addEventListener('change', switchTheme);
+
+// Comprobar si el usuario ya tiene una preferencia guardada
+const currentTheme = localStorage.getItem('theme');
+if (currentTheme) {
+    if (currentTheme === 'dark') {
+        toggleSwitch.checked = true;
+        document.body.classList.add('dark-theme');
+    }
+}
