@@ -58,6 +58,7 @@ body {
     padding: 0;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 }
 .nav-links li a {
     display: block;
@@ -277,4 +278,57 @@ button:hover {
 
 .highlight-square {
     box-shadow: inset 0 0 3px 3px green;
+}
+
+/* --- 8. ESTILOS RESPONSIVE --- */
+@media (max-width: 768px) {
+    /* Ajustes en la barra de navegación */
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 5%;
+    }
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        align-items: flex-start;
+        margin-top: 10px;
+    }
+    .nav-links li {
+        width: 100%;
+        text-align: left;
+    }
+    .nav-links li a {
+        padding: 10px 0;
+    }
+    .theme-switch-wrapper {
+        padding: 10px 0;
+    }
+    body {
+        /* Aumentar padding para que el contenido no quede debajo de la nav-bar expandida */
+        padding-top: 220px; 
+    }
+
+    /* Ajustes en el contenido principal */
+    .about-content, .analysis-container {
+        flex-direction: column;
+    }
+    .chart-container {
+        min-width: 0; /* Permitir que se encoja */
+    }
+
+    /* Ajustes en la ventana modal */
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-brand {
+        font-size: 1.2em;
+    }
+    .main-section {
+        padding: 20px 5%;
+    }
 }
