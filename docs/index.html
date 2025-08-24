@@ -35,6 +35,7 @@
         <div class="game-container">
             <div id="miTablero"></div>
             <div class="controls-container">
+                <div class="clock-display opponent-clock">10:00</div>
                 <div class="info-box">
                     <h3>Estado del Juego</h3>
                     <p id="status"></p>
@@ -48,6 +49,7 @@
                     <button id="savePgnButton">Copiar Partida (PGN)</button>
                     <button id="settingsButton">🎨 Ajustes</button>
                 </div>
+                <div class="clock-display player-clock">10:00</div>
             </div>
         </div>
     </section>
@@ -89,6 +91,17 @@
         <div class="modal-content">
             <span class="close-button" role="button" aria-label="Cerrar">&times;</span>
             <h2>Personalización del Tablero</h2>
+            <div class="setting-option">
+                <h3>Control de Tiempo</h3>
+                <div class="options">
+                    <select id="timeControlSelector" class="theme-select">
+                        <option value="5_3">5 min + 3 seg</option>
+                        <option value="10_0" selected>10 min</option>
+                        <option value="15_10">15 min + 10 seg</option>
+                        <option value="999_0">Ilimitado</option>
+                    </select>
+                </div>
+            </div>
             <div class="setting-option">
                 <h3>Estilo de Piezas</h3>
                 <div class="preview-board" id="previewBoardPieces"></div>
