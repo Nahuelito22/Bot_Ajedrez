@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBoardColor = document.querySelector('.color-btn.selected').getAttribute('data-color');
         currentDotColor = document.querySelector('.dot-color-btn.selected').getAttribute('data-dot-color');
         timeControlType = document.querySelector('input[name="timeControlType"]:checked').value;
-        customMinutes = parseInt(timeMinutesInput.value, 10) || 10;
+        customMinutes = parseFloat(timeMinutesInput.value); // <-- CAMBIO A parseFloat
         customIncrement = parseInt(timeIncrementInput.value, 10) || 0;
 
         // Aplicar temas visuales
