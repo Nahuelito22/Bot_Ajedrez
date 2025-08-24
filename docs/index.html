@@ -35,7 +35,7 @@
         <div class="game-container">
             <div id="miTablero"></div>
             <div class="controls-container">
-                <div class="clock-display opponent-clock">10:00</div>
+                <div class="clock-display opponent-clock">--:--</div>
                 <div class="info-box">
                     <h3>Estado del Juego</h3>
                     <p id="status"></p>
@@ -49,7 +49,7 @@
                     <button id="savePgnButton">Copiar Partida (PGN)</button>
                     <button id="settingsButton">🎨 Ajustes</button>
                 </div>
-                <div class="clock-display player-clock">10:00</div>
+                <div class="clock-display player-clock">--:--</div>
             </div>
         </div>
     </section>
@@ -90,16 +90,16 @@
     <div id="settingsModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content">
             <span class="close-button" role="button" aria-label="Cerrar">&times;</span>
-            <h2>Personalización del Tablero</h2>
+            <h2>Personalización</h2>
             <div class="setting-option">
                 <h3>Control de Tiempo</h3>
-                <div class="options">
-                    <select id="timeControlSelector" class="theme-select">
-                        <option value="5_3">5 min + 3 seg</option>
-                        <option value="10_0" selected>10 min</option>
-                        <option value="15_10">15 min + 10 seg</option>
-                        <option value="999_0">Ilimitado</option>
-                    </select>
+                <div class="time-control-options">
+                    <label><input type="radio" name="timeControlType" value="unlimited" checked> Sin Límite</label>
+                    <label><input type="radio" name="timeControlType" value="custom"> Personalizado</label>
+                </div>
+                <div class="custom-time-inputs hidden">
+                    <input type="number" id="timeMinutes" value="10" min="1" class="time-input"> min
+                    <input type="number" id="timeIncrement" value="0" min="0" class="time-input"> seg
                 </div>
             </div>
             <div class="setting-option">
@@ -118,6 +118,7 @@
                         <option value="chessnut">Chessnut</option>
                         <option value="companion">Companion</option>
                         <option value="cooke">Cooke</option>
+                        <option value="disguised">Disguised</option>
                         <option value="dubrovny">Dubrovny</option>
                         <option value="fantasy">Fantasy</option>
                         <option value="firi">Firi</option>
@@ -133,6 +134,7 @@
                         <option value="maestro">Maestro</option>
                         <option value="merida">Merida</option>
                         <option value="monarchy">Monarchy</option>
+                        <option value="mono">Mono</option>
                         <option value="mpchess">Mpchess</option>
                         <option value="pirouetti">Pirouetti</option>
                         <option value="pixel">Pixel</option>
@@ -147,7 +149,6 @@
                         <option value="wikipedia" selected>Wikipedia</option>
                         <option value="xkcd">Xkcd</option>
                     </select>
-                    <button id="confirmThemeButton" class="action-btn">Aplicar</button>
                 </div>
             </div>
             <div class="setting-option">
@@ -167,6 +168,9 @@
                     <button class="dot-color-btn" data-dot-color="red">Rojo</button>
                     <button class="dot-color-btn" data-dot-color="green">Verde</button>
                 </div>
+            </div>
+            <div class="setting-option">
+                 <button id="confirmThemeButton" class="action-btn">Aplicar y Jugar</button>
             </div>
         </div>
     </div>

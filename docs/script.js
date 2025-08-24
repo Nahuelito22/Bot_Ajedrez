@@ -1,5 +1,5 @@
 // ========================================================
-//     SCRIPT FINAL Y DEFINITIVO (v6 - CON RELOJ)
+//     SCRIPT FINAL Y DEFINITIVO (v7 - TIEMPO PERSONALIZADO)
 // ========================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,13 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     var currentPieceTheme = 'wikipedia';
     var currentBoardColor = 'default';
     var currentDotColor = 'default';
-    var currentTimeCtrl = '10_0';
-
+    
     // --- NUEVAS VARIABLES DEL RELOJ ---
-    var whiteTime = 10 * 60 * 1000; // 10 minutos en ms
-    var blackTime = 10 * 60 * 1000;
-    var increment = 0;
-    var activeClock = null; // 'w' o 'b'
+    var timeControlType = 'unlimited'; // 'unlimited' o 'custom'
+    var customMinutes = 10;
+    var customIncrement = 0;
+    var whiteTime, blackTime, increment;
+    var activeClock = null;
     var timerIntervalId = null;
 
     const pieceThemeExtensions = {
@@ -50,13 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleSwitch = document.querySelector('#checkbox');
     const confirmThemeBtn = document.getElementById('confirmThemeButton');
     const pieceThemeSelector = document.getElementById('pieceThemeSelector');
-    const timeControlSelector = document.getElementById('timeControlSelector');
+    const timeControlTypeRadios = document.querySelectorAll('input[name="timeControlType"]');
+    const customTimeInputsEl = document.querySelector('.custom-time-inputs');
+    const timeMinutesInput = document.getElementById('timeMinutes');
+    const timeIncrementInput = document.getElementById('timeIncrement');
     const hamburgerMenu = document.querySelector('.hamburger-menu');
     const navLinks = document.querySelector('.nav-links');
 
     // --- 2. LÓGICA DEL RELOJ ---
     function formatTime(ms) {
-        if (ms >= 3600000) return "--:--"; // Ilimitado
+        if (timeControlType === 'unlimited') return "--:--";
         const totalSeconds = Math.ceil(ms / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
@@ -77,45 +80,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startTimer() {
-        if (timerIntervalId) stopTimer(); // Detener cualquier timer anterior
-        if (game.game_over()) return;
+        if (timerIntervalId || timeControlType === 'unlimited' || game.game_over()) return;
 
         activeClock = game.turn();
         if (activeClock === 'w') whiteClockEl.classList.add('active-clock');
         else blackClockEl.classList.add('active-clock');
 
         let lastTime = Date.now();
-
         timerIntervalId = setInterval(() => {
             const now = Date.now();
             const delta = now - lastTime;
             lastTime = now;
+            let timeup = false;
 
             if (activeClock === 'w') {
                 whiteTime -= delta;
-                if (whiteTime <= 0) {
-                    whiteTime = 0;
-                    stopTimer();
-                    alert("¡Se acabó el tiempo! Ganan las Negras.");
-                    game.load('4k3/4P3/4K3/8/8/8/8/8 b - - 0 1'); // Posición de victoria para negras
-                }
+                if (whiteTime <= 0) { whiteTime = 0; timeup = true; }
             } else {
                 blackTime -= delta;
-                if (blackTime <= 0) {
-                    blackTime = 0;
-                    stopTimer();
-                    alert("¡Se acabó el tiempo! Ganan las Blancas.");
-                    game.load('8/8/8/8/8/4k3/4p3/4K3 w - - 0 1'); // Posición de victoria para blancas
-                }
+                if (blackTime <= 0) { blackTime = 0; timeup = true; }
             }
             updateClockDisplays();
+            if (timeup) {
+                stopTimer();
+                alert(`¡Se acabó el tiempo! Ganan las ${activeClock === 'w' ? 'Negras' : 'Blancas'}.`);
+                game.load('8/8/8/8/8/8/8/8 w - - 0 1'); // Clear board
+            }
         }, 100);
     }
 
     function switchActiveClock() {
-        if (currentTimeCtrl === '999_0') return; // No hacer nada si el tiempo es ilimitado
+        if (timeControlType === 'unlimited') return;
         stopTimer();
-        const justMoved = game.turn() === 'b' ? 'w' : 'b'; // El jugador que acaba de mover
+        const justMoved = game.turn() === 'b' ? 'w' : 'b';
         if (justMoved === 'w') whiteTime += increment;
         else blackTime += increment;
         updateClockDisplays();
@@ -124,12 +121,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initClocks() {
         stopTimer();
-        const timeValue = timeControlSelector.value;
-        currentTimeCtrl = timeValue;
-        const [minutes, inc] = timeValue.split('_').map(Number);
-        whiteTime = minutes * 60 * 1000;
-        blackTime = minutes * 60 * 1000;
-        increment = inc * 1000;
+        if (timeControlType === 'custom') {
+            whiteTime = customMinutes * 60 * 1000;
+            blackTime = customMinutes * 60 * 1000;
+            increment = customIncrement * 1000;
+        } else {
+            whiteTime = Infinity;
+            blackTime = Infinity;
+            increment = 0;
+        }
         updateClockDisplays();
     }
 
@@ -188,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleBoardClick(square) {
         if (isAiThinking || game.turn() !== 'w') return;
+        if (game.history().length === 0 && timeControlType === 'custom') startTimer(); // Iniciar reloj en la primera jugada
         const pieceOnSquare = game.get(square);
         removeMoveDots();
         if(selectedSquare) unhighlightSquare(selectedSquare);
@@ -230,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedSquare) { unhighlightSquare(selectedSquare); selectedSquare = null; }
         removeMoveDots();
         initClocks();
-        if (currentTimeCtrl !== '999_0') startTimer();
     }
 
     document.getElementById('resetButton').addEventListener('click', startNewGame);
@@ -240,13 +240,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     settingsBtn.onclick = () => {
         modal.style.display = "block";
+        // Restaurar selecciones actuales
+        document.querySelector(`input[name="timeControlType"][value="${timeControlType}"]`).checked = true;
+        if (timeControlType === 'custom') customTimeInputsEl.classList.remove('hidden');
+        else customTimeInputsEl.classList.add('hidden');
+        timeMinutesInput.value = customMinutes;
+        timeIncrementInput.value = customIncrement;
         pieceThemeSelector.value = currentPieceTheme;
-        timeControlSelector.value = currentTimeCtrl;
         document.querySelector(`.color-btn[data-color="${currentBoardColor}"]`).classList.add('selected');
         document.querySelector(`.dot-color-btn[data-dot-color="${currentDotColor}"]`).classList.add('selected');
         modalContent.setAttribute('data-board-theme', currentBoardColor);
         updatePreview(currentPieceTheme);
     };
+
+    timeControlTypeRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') customTimeInputsEl.classList.remove('hidden');
+            else customTimeInputsEl.classList.add('hidden');
+        });
+    });
 
     function closeModal() { modal.style.display = "none"; }
     closeBtn.onclick = closeModal;
@@ -258,21 +270,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.dot-color-btn').forEach(button => { button.addEventListener('click', function() { document.querySelectorAll('.dot-color-btn').forEach(b => b.classList.remove('selected')); this.classList.add('selected'); }); });
 
     confirmThemeBtn.addEventListener('click', () => {
+        // Guardar todos los ajustes
         currentPieceTheme = pieceThemeSelector.value;
         currentBoardColor = document.querySelector('.color-btn.selected').getAttribute('data-color');
         currentDotColor = document.querySelector('.dot-color-btn.selected').getAttribute('data-dot-color');
+        timeControlType = document.querySelector('input[name="timeControlType"]:checked').value;
+        customMinutes = parseInt(timeMinutesInput.value, 10) || 10;
+        customIncrement = parseInt(timeIncrementInput.value, 10) || 0;
+
+        // Aplicar temas visuales
         document.body.setAttribute('data-board-theme', currentBoardColor);
         document.body.setAttribute('data-dot-theme', currentDotColor);
-        
-        // Si el control de tiempo cambió, se inicia una nueva partida
-        if (timeControlSelector.value !== currentTimeCtrl) {
-            startNewGame();
-        } else { // Si no, solo se actualiza el tema
-            const newBoardConfig = { draggable: false, position: game.fen(), pieceTheme: getPieceThemePath(currentPieceTheme) };
-            board.destroy();
-            board = Chessboard('miTablero', newBoardConfig);
-            board.resize();
-        }
+
+        // Iniciar nueva partida para aplicar todos los cambios
+        startNewGame();
         closeModal();
     });
 
@@ -288,5 +299,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 8. INICIALIZACIÓN ---
     const boardConfig = { draggable: false, position: 'start', pieceTheme: getPieceThemePath(currentPieceTheme) };
     board = Chessboard('miTablero', boardConfig);
-    startNewGame(); // Iniciar la primera partida
+    startNewGame();
 });

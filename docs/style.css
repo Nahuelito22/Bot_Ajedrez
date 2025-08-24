@@ -115,6 +115,13 @@ button:hover, .action-btn:hover { background-color: var(--primary-bg); }
 .close-button { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
 .preview-board { width: 300px; height: 150px; margin: 10px auto; overflow: hidden; }
 
+/* Nuevos estilos para el control de tiempo personalizado */
+.time-control-options { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
+.time-control-options label { cursor: pointer; user-select: none; }
+.custom-time-inputs { display: flex; gap: 10px; justify-content: center; align-items: center; padding: 10px; background-color: var(--primary-bg); border-radius: 6px; }
+.time-input { width: 60px; text-align: center; font-family: monospace; font-size: 1em; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--secondary-bg); color: var(--text-color); }
+.hidden { display: none; }
+
 /* --- 6. ESTILOS DEL TABLERO Y RESALTADO --- */
 /* Default Theme */
 .white-1e1d7 { background-color: #f0d9b5; }
