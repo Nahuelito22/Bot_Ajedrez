@@ -1,5 +1,5 @@
 // ========================================================
-//     SCRIPT FINAL Y DEFINITIVO (v3)
+//     SCRIPT FINAL Y DEFINITIVO (v5 - CON PERSONALIZACIÓN DE PUNTOS)
 // ========================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var isAiThinking = false;
     var currentPieceTheme = 'wikipedia';
     var currentBoardColor = 'default';
+    var currentDotColor = 'default'; // <-- NUEVA VARIABLE
     var selectedSquare = null;
     var previewBoard = null;
 
@@ -94,24 +95,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 3. LÓGICA DE MOVIMIENTOS ---
-    
-    // El listener manual que SÍ funciona
     boardEl.addEventListener('click', (e) => {
         const squareEl = e.target.closest('[data-square]');
         if (squareEl) {
             const square = squareEl.getAttribute('data-square');
             handleBoardClick(square);
         }
-    }, true); // Fase de captura es la clave
+    }, true);
 
     function handleBoardClick(square) {
         if (isAiThinking || game.turn() !== 'w') return;
         const pieceOnSquare = game.get(square);
-
+        removeMoveDots();
+        if(selectedSquare) unhighlightSquare(selectedSquare);
         if (selectedSquare) {
-            unhighlightSquare(selectedSquare);
             if (selectedSquare === square) { selectedSquare = null; return; }
-            if (pieceOnSquare && pieceOnSquare.color === 'w') { selectedSquare = square; highlightSquare(square); return; }
+            if (pieceOnSquare && pieceOnSquare.color === 'w') {
+                selectedSquare = square;
+                highlightSquare(square);
+                showMoveDots(square);
+                return;
+            }
             const move = game.move({ from: selectedSquare, to: square, promotion: 'q' });
             if (move === null) { selectedSquare = null; return; }
             board.position(game.fen());
@@ -122,11 +126,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pieceOnSquare && pieceOnSquare.color === 'w') {
                 selectedSquare = square;
                 highlightSquare(square);
+                showMoveDots(square);
             }
         }
     }
 
-    // --- 4. RESALTADO DINÁMICO CON CONTRASTE ---
+    // --- 4. AYUDAS VISUALES (PUNTOS Y RESALTADO) ---
+    function showMoveDots(square) {
+        const moves = game.moves({ square: square, verbose: true });
+        moves.forEach(move => {
+            const dot = document.createElement('div');
+            dot.classList.add('move-dot');
+            boardEl.querySelector(`[data-square=${move.to}]`).appendChild(dot);
+        });
+    }
+
+    function removeMoveDots() {
+        boardEl.querySelectorAll('.move-dot').forEach(dot => dot.remove());
+    }
+
     function parseRGB(rgbString) {
         const m = rgbString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
         return m ? [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])] : null;
@@ -158,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         board.start();
         updateStatus();
         if (selectedSquare) { unhighlightSquare(selectedSquare); selectedSquare = null; }
+        removeMoveDots();
     });
 
     document.getElementById('savePgnButton').addEventListener('click', () => {
@@ -181,9 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     settingsBtn.onclick = () => {
         modal.style.display = "block";
+        // Restaurar selecciones actuales
         pieceThemeSelector.value = currentPieceTheme;
-        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
         document.querySelector(`.color-btn[data-color="${currentBoardColor}"]`).classList.add('selected');
+        document.querySelector(`.dot-color-btn[data-dot-color="${currentDotColor}"]`).classList.add('selected');
+        // Aplicar temas a la previsualización
         modalContent.setAttribute('data-board-theme', currentBoardColor);
         updatePreview(currentPieceTheme);
     };
@@ -197,17 +218,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.color-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const color = this.getAttribute('data-color');
-            modalContent.setAttribute('data-board-theme', color);
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            modalContent.setAttribute('data-board-theme', this.getAttribute('data-color'));
+        });
+    });
+
+    // Listener para los nuevos botones de color de puntos
+    document.querySelectorAll('.dot-color-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.dot-color-btn').forEach(b => b.classList.remove('selected'));
             this.classList.add('selected');
         });
     });
 
     confirmThemeBtn.addEventListener('click', () => {
+        // Aplicar tema de piezas
         currentPieceTheme = pieceThemeSelector.value;
-        currentBoardColor = modalContent.getAttribute('data-board-theme') || 'default';
+        
+        // Aplicar tema de color del tablero
+        const selectedBoardColor = document.querySelector('.color-btn.selected').getAttribute('data-color');
+        currentBoardColor = selectedBoardColor;
         document.body.setAttribute('data-board-theme', currentBoardColor);
+
+        // Aplicar tema de color de los puntos
+        const selectedDotColor = document.querySelector('.dot-color-btn.selected').getAttribute('data-dot-color');
+        currentDotColor = selectedDotColor;
+        document.body.setAttribute('data-dot-theme', currentDotColor);
+
+        // Reconstruir tablero
         const newBoardConfig = {
             draggable: false,
             position: game.fen(),
@@ -249,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         draggable: false,
         position: 'start',
         pieceTheme: getPieceThemePath(currentPieceTheme)
-        // onSquareClick se gestiona manualmente con el listener de arriba
     };
     board = Chessboard('miTablero', boardConfig);
     updateStatus();
