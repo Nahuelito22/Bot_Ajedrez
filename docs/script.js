@@ -288,3 +288,14 @@ board = Chessboard('miTablero', boardConfig);
 updateStatus();
 
 document.getElementById('miTablero').addEventListener('click', handleSquareClick);
+
+// --- 6. LÓGICA DEL MENÚ HAMBURGUESA ---
+document.addEventListener('DOMContentLoaded', () => {
+    const hamburgerMenu = document.querySelector('.hamburger-menu');
+    const navLinks = document.querySelector('.nav-links');
+
+    hamburgerMenu.addEventListener('click', () => {
+        hamburgerMenu.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+});
