@@ -17,8 +17,7 @@ const toggleSwitch = document.querySelector('#checkbox');
 var previewBoard = null;
 
 // URLs de la API (Descomentar la que se quiera usar)
-const API_URL = "http://127.0.0.1:8000/predict_move"; // Para pruebas locales
-// const API_URL = "https://nahuelito22-bot-ajedrez.hf.space/predict_move"; // Para producción
+const API_URL = "https://nahuelito22-bot-ajedrez.hf.space/predict_move"; // Para producción
 
 
 // --- 2. FUNCIONES PRINCIPALES DEL JUEGO ---
