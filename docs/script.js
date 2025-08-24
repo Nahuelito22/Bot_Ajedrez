@@ -8,6 +8,7 @@ var game = new Chess();
 var isAiThinking = false;
 var currentPieceTheme = 'wikipedia'; // Tema de piezas por defecto
 var currentBoardColor = 'default'; // Color del tablero por defecto
+var selectedSquare = null; // Para la lógica de click-to-move
 
 // Mapa de temas de piezas y sus extensiones de archivo
 const pieceThemeExtensions = {
@@ -94,21 +95,60 @@ function updateStatus() {
   pgnEl.innerHTML = game.pgn();
 }
 
-// --- 3. FUNCIONES DE INTERACCIÓN CON EL TABLERO (CALLBACKS) ---
+// --- 3. LÓGICA DE CLICK-TO-MOVE ---
 
-function onDragStart(source, piece, position, orientation) {
-  return !(game.game_over() || game.turn() !== 'w' || isAiThinking);
+function highlightSquare(square) {
+    const squareEl = document.querySelector(`#miTablero [data-square=${square}]`);
+    if (squareEl) {
+        squareEl.classList.add('highlight-square');
+    }
 }
 
-function onDrop(source, target) {
-  const move = game.move({ from: source, to: target, promotion: 'q' });
-  if (move === null) return 'snapback';
-  updateStatus();
-  window.setTimeout(getAiMove, 250);
+function unhighlightSquare(square) {
+    const squareEl = document.querySelector(`#miTablero [data-square=${square}]`);
+    if (squareEl) {
+        squareEl.classList.remove('highlight-square');
+    }
 }
 
-function onSnapEnd() {
-  board.position(game.fen());
+function handleSquareClick(e) {
+    const squareEl = e.target.closest('[data-square]');
+    if (!squareEl) return;
+    const square = squareEl.getAttribute('data-square');
+
+    if (game.turn() !== 'w' || isAiThinking) {
+        return;
+    }
+
+    const piece = game.get(square);
+
+    if (selectedSquare === null) {
+        if (piece && piece.color === 'w') {
+            selectedSquare = square;
+            highlightSquare(square);
+        }
+    } else {
+        unhighlightSquare(selectedSquare);
+        const move = game.move({
+            from: selectedSquare,
+            to: square,
+            promotion: 'q'
+        });
+
+        if (move === null) {
+            if (piece && piece.color === 'w') {
+                selectedSquare = square;
+                highlightSquare(square);
+            } else {
+                selectedSquare = null;
+            }
+        } else {
+            selectedSquare = null;
+            board.position(game.fen());
+            updateStatus();
+            window.setTimeout(getAiMove, 250);
+        }
+    }
 }
 
 // --- 4. LÓGICA DE BOTONES Y AJUSTES ---
@@ -201,11 +241,9 @@ document.querySelectorAll('.color-btn').forEach(button => {
 });
 
 confirmThemeBtn.addEventListener('click', () => {
-    // Aplicar tema de piezas
     const selectedTheme = pieceThemeSelector.value;
     cambiarTema(selectedTheme);
 
-    // Aplicar color del tablero
     currentBoardColor = modalContent.getAttribute('data-board-theme') || 'default';
     if (currentBoardColor === 'default') {
       document.body.removeAttribute('data-board-theme');
@@ -219,12 +257,8 @@ confirmThemeBtn.addEventListener('click', () => {
 function cambiarTema(themeName) {
   currentPieceTheme = themeName;
   const newConfig = {
-    draggable: true,
     position: game.fen(),
     pieceTheme: getPieceThemePath(themeName),
-    onDragStart: onDragStart,
-    onDrop: onDrop,
-    onSnapEnd: onSnapEnd
   };
   board = Chessboard('miTablero', newConfig);
 }
@@ -249,12 +283,10 @@ if (currentTheme === 'dark') {
 
 // --- 5. INICIALIZACIÓN DEL TABLERO PRINCIPAL ---
 const config = {
-  draggable: true,
   position: 'start',
   pieceTheme: getPieceThemePath(currentPieceTheme),
-  onDragStart: onDragStart,
-  onDrop: onDrop,
-  onSnapEnd: onSnapEnd
 };
 board = Chessboard('miTablero', config);
 updateStatus();
+
+document.getElementById('miTablero').addEventListener('click', handleSquareClick);
