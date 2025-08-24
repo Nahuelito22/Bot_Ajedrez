@@ -1,5 +1,5 @@
 // ========================================================
-//     SCRIPT FINAL Y DEFINITIVO PARA BOT DE AJEDREZ
+//     SCRIPT FINAL Y DEFINITIVO (v3)
 // ========================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -93,32 +93,16 @@ document.addEventListener('DOMContentLoaded', () => {
         pgnEl.innerHTML = game.pgn();
     }
 
-    // --- 3. LÓGICA DE MOVIMIENTOS (DRAG & CLICK) ---
-    function onDragStart(source, piece) {
-        if (game.game_over() || game.turn() !== 'w' || isAiThinking) return false;
-    }
-
-    function onDrop(source, target) {
-        const move = game.move({ from: source, to: target, promotion: 'q' });
-        if (move === null) return 'snapback';
-        if (selectedSquare) {
-            unhighlightSquare(selectedSquare);
-            selectedSquare = null;
-        }
-        updateStatus();
-        window.setTimeout(getAiMove, 250);
-    }
-
-    function onSnapEnd() { board.position(game.fen()); }
-
-    // --- LÓGICA DE CLIC MANUAL (para evitar conflictos con drag) ---
+    // --- 3. LÓGICA DE MOVIMIENTOS ---
+    
+    // El listener manual que SÍ funciona
     boardEl.addEventListener('click', (e) => {
         const squareEl = e.target.closest('[data-square]');
         if (squareEl) {
             const square = squareEl.getAttribute('data-square');
             handleBoardClick(square);
         }
-    }, true); // <-- LA SOLUCIÓN: Usar la fase de captura de eventos
+    }, true); // Fase de captura es la clave
 
     function handleBoardClick(square) {
         if (isAiThinking || game.turn() !== 'w') return;
@@ -159,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!squareEl) return;
         const bg = window.getComputedStyle(squareEl).backgroundColor;
         const lum = getLuminance(parseRGB(bg));
-        const highlightColor = lum < 0.5 ? 'rgba(255, 255, 0, 0.8)' : 'rgba(204, 102, 0, 0.8)'; // Amarillo para oscuros, Naranja para claros
+        const highlightColor = lum < 0.5 ? 'rgba(255, 255, 0, 0.8)' : 'rgba(204, 102, 0, 0.8)';
         squareEl.style.boxShadow = `inset 0 0 2px 2px ${highlightColor}`;
     }
 
@@ -225,11 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBoardColor = modalContent.getAttribute('data-board-theme') || 'default';
         document.body.setAttribute('data-board-theme', currentBoardColor);
         const newBoardConfig = {
-            draggable: true,
+            draggable: false,
             position: game.fen(),
-            onDragStart: onDragStart,
-            onDrop: onDrop,
-            onSnapEnd: onSnapEnd,
             pieceTheme: getPieceThemePath(currentPieceTheme)
         };
         board.destroy();
@@ -265,12 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 7. INICIALIZACIÓN DEL TABLERO PRINCIPAL ---
     const boardConfig = {
-        draggable: true,
+        draggable: false,
         position: 'start',
-        onDragStart: onDragStart,
-        onDrop: onDrop,
-        onSnapEnd: onSnapEnd,
         pieceTheme: getPieceThemePath(currentPieceTheme)
+        // onSquareClick se gestiona manualmente con el listener de arriba
     };
     board = Chessboard('miTablero', boardConfig);
     updateStatus();
