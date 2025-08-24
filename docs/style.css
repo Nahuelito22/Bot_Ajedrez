@@ -1,4 +1,4 @@
-/* --- VARIABLES Y ESTILOS BASE --- */
+/* --- 1. VARIABLES DE TEMA Y ESTILO GENERAL --- */
 :root {
     --primary-bg: #f0f0f0;
     --secondary-bg: #ffffff;
@@ -7,9 +7,8 @@
     --shadow: 0 2px 4px rgba(0,0,0,0.1);
     --slider-bg: #ccc;
     --modal-backdrop: rgba(0,0,0,0.6);
-    --transition-speed: 0.28s;
-    --nav-height-desktop: 80px;
-    --nav-height-mobile: 64px;
+    --transition-speed: 0.3s;
+    --nav-height: 80px;
 }
 
 body.dark-theme {
@@ -24,21 +23,17 @@ body.dark-theme {
 html { scroll-behavior: smooth; }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    font-family: sans-serif;
     background-color: var(--primary-bg);
     color: var(--text-color);
     margin: 0;
-    padding-top: var(--nav-height-desktop);
+    padding-top: var(--nav-height);
     transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
-/* body class used to block scroll during drag */
-.body-no-scroll {
-    overflow: hidden;
-    touch-action: none;
-}
+body.body-no-scroll { overflow: hidden; }
 
-/* --- NAVBAR --- */
+/* --- 2. BARRA DE NAVEGACIÓN Y MENÚ HAMBURGUESA --- */
 .navbar {
     position: fixed;
     top: 0;
@@ -52,10 +47,10 @@ body {
     padding: 0 5%;
     box-sizing: border-box;
     z-index: 1000;
-    height: var(--nav-height-desktop);
+    height: var(--nav-height);
 }
 
-.nav-brand { font-size: 1.2rem; font-weight: 700; }
+.nav-brand { font-size: 1.5em; font-weight: bold; }
 
 .nav-links {
     list-style: none;
@@ -67,130 +62,74 @@ body {
 
 .nav-links li a {
     display: block;
-    padding: 16px 12px;
+    padding: 20px 15px;
     text-decoration: none;
     color: var(--text-color);
-    font-weight: 700;
+    font-weight: bold;
 }
 
-.nav-links li a:hover { background-color: var(--primary-bg); border-radius: 6px; }
+.nav-links li a:hover { background-color: var(--primary-bg); }
 
-/* HAMBURGER & THEME SWITCH */
-.hamburger-menu { display: none; background: transparent; border: none; cursor: pointer; }
-.hamburger-bar { width: 30px; height: 3px; background-color: var(--text-color); border-radius: 2px; display: block; margin: 4px 0; transition: transform var(--transition-speed), opacity var(--transition-speed); }
-.theme-switch-wrapper { display: flex; align-items: center; padding: 0 10px; }
-.theme-switch { display: inline-block; height: 24px; position: relative; width: 44px; }
-.theme-switch input { display: none; }
-.slider { background-color: var(--slider-bg); position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 24px; }
-.slider:before { background-color: white; position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; transition: .4s; border-radius: 50%; }
-input:checked + .slider { background-color: #2196F3; }
-input:checked + .slider:before { transform: translateX(20px); }
+.hamburger-menu { display: none; }
 
-/* --- LAYOUT --- */
+/* --- 3. CONTENIDO PRINCIPAL Y TABLERO --- */
 .main-section { padding: 40px 5%; min-height: 80vh; display: flex; justify-content: center; align-items: center; }
-.game-container, .about-container, .analysis-container { width: 100%; max-width: 960px; box-sizing: border-box; }
-.game-container { display: flex; gap: 20px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
-
-/* TABLERO: siempre cuadrado, responsive */
-#miTablero {
-    width: min(92vw, 500px);
-    max-width: 500px;
-    aspect-ratio: 1 / 1;
-    box-sizing: border-box;
-    margin: 0 auto;
-    min-width: 0;
-}
-
-/* controles */
-.controls-container { display: flex; flex-direction: column; gap: 12px; flex: 1; min-width: 220px; }
-.info-box { background-color: var(--secondary-bg); padding: 12px 16px; border-radius: 8px; box-shadow: var(--shadow); }
+.game-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; width: 100%; max-width: 900px; }
+#miTablero { width: 100%; max-width: 500px; }
+.controls-container { display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px; }
+.info-box { background-color: var(--secondary-bg); padding: 10px 20px; border-radius: 8px; box-shadow: var(--shadow); }
 #pgn { font-family: monospace; word-wrap: break-word; max-height: 150px; overflow-y: auto; }
 
-/* otros */
-.analysis-container, .about-container { background-color: var(--secondary-bg); padding: 16px 20px; border-radius: 8px; box-shadow: var(--shadow); box-sizing: border-box; }
-.analysis-container { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-.chart-container { text-align: center; flex: 1 1 280px; min-width: 0; }
+/* --- 4. SECCIONES DE ANÁLISIS Y SOBRE EL PROYECTO --- */
+.analysis-container, .about-container { background-color: var(--secondary-bg); padding: 20px 30px; border-radius: 8px; box-shadow: var(--shadow); box-sizing: border-box; width: 100%; max-width: 900px; }
+.analysis-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.chart-container { text-align: center; flex: 1; min-width: 0; }
 .chart-container img { max-width: 100%; height: auto; border: 1px solid var(--border-color); }
+.about-content { display: flex; gap: 20px; }
 
-/* botones y modal */
-button, .action-btn {
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: var(--secondary-bg);
-    color: var(--text-color);
-    cursor: pointer;
-    font-weight: 700;
-    transition: background-color 0.18s;
-    -webkit-tap-highlight-color: transparent;
-}
+/* --- 5. BOTONES Y MODAL --- */
+button, .action-btn { padding: 10px 15px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--secondary-bg); color: var(--text-color); cursor: pointer; font-weight: bold; transition: background-color 0.2s; -webkit-tap-highlight-color: transparent; }
 button:hover, .action-btn:hover { background-color: var(--primary-bg); }
 .action-buttons, .options { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-
-/* modal */
 .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: var(--modal-backdrop); }
-.modal-content { background-color: var(--secondary-bg); margin: 10% auto; padding: 16px; border: 1px solid var(--border-color); width: 80%; max-width: 600px; border-radius: 10px; position: relative; }
-.close-button { color: #aaa; position: absolute; top: 8px; right: 14px; font-size: 26px; font-weight: bold; cursor: pointer; }
-.preview-board { width: 280px; height: 140px; margin: 10px auto; overflow: hidden; }
+.modal-content { background-color: var(--secondary-bg); margin: 10% auto; padding: 20px; border: 1px solid var(--border-color); width: 80%; max-width: 600px; border-radius: 10px; position: relative; }
+.close-button { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
+.preview-board { width: 300px; height: 150px; margin: 10px auto; overflow: hidden; }
 
-/* board themes (tuya) */
+/* --- 6. ESTILOS DEL TABLERO Y RESALTADO --- */
+/* Default Theme */
 .white-1e1d7 { background-color: #f0d9b5; }
 .black-3c85d { background-color: #b58863; }
 
-/* fallback highlight */
-#miTablero .highlight-square {
-  box-shadow: inset 0 0 0 4px rgba(0,120,0,0.9) !important;
-  border-radius: 6px !important;
-}
+/* Grayscale Theme */
+body[data-board-theme="grayscale"] .white-1e1d7, .modal-content[data-board-theme="grayscale"] .white-1e1d7 { background-color: #e1e1e1; }
+body[data-board-theme="grayscale"] .black-3c85d, .modal-content[data-board-theme="grayscale"] .black-3c85d { background-color: #aaaaaa; }
 
-/* --- RESPONSIVE: MOBILE --- */
+/* Blue Theme */
+body[data-board-theme="blue"] .white-1e1d7, .modal-content[data-board-theme="blue"] .white-1e1d7 { background-color: #dee3e6; }
+body[data-board-theme="blue"] .black-3c85d, .modal-content[data-board-theme="blue"] .black-3c85d { background-color: #8ca2ad; }
+
+/* Green Theme */
+body[data-board-theme="green"] .white-1e1d7, .modal-content[data-board-theme="green"] .white-1e1d7 { background-color: #ffffdd; }
+body[data-board-theme="green"] .black-3c85d, .modal-content[data-board-theme="green"] .black-3c85d { background-color: #86a666; }
+
+.color-btn.selected { border-color: #2196F3; box-shadow: 0 0 5px #2196F3; }
+
+/* El resaltado ahora se maneja vía JS para contraste dinámico */
+
+/* --- 7. ESTILOS RESPONSIVE --- */
 @media (max-width: 768px) {
-    body { padding-top: var(--nav-height-mobile); }
-
-    .hamburger-menu {
-        display: block;
-        padding: 8px;
-        z-index: 1100;
-    }
-
-    .nav-links {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 70%;
-        max-width: 320px;
-        height: 100%;
-        flex-direction: column;
-        background-color: var(--secondary-bg);
-        box-shadow: var(--shadow);
-        justify-content: flex-start;
-        transform: translateX(-100%);
-        transition: transform var(--transition-speed) ease-in-out;
-        padding-top: calc(var(--nav-height-mobile) + 8px);
-        gap: 6px;
-        overflow-y: auto;
-        z-index: 1200;
-    }
-
+    .hamburger-menu { display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 25px; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1100; }
+    .hamburger-bar { display: block; width: 100%; height: 3px; background-color: var(--text-color); border-radius: 2px; transition: all var(--transition-speed) ease-in-out; }
+    .nav-links { position: fixed; top: 0; left: 0; width: 70%; max-width: 300px; height: 100%; flex-direction: column; background-color: var(--secondary-bg); box-shadow: var(--shadow); justify-content: center; transform: translateX(-100%); transition: transform var(--transition-speed) ease-in-out; z-index: 1050; }
     .nav-links.active { transform: translateX(0); }
-
-    .nav-links li a { padding: 18px; border-top: 1px solid var(--border-color); border-radius: 0; }
-
-    .theme-switch-wrapper { justify-content: center; padding: 12px; }
-
-    /* apilar contenido */
-    .game-container { flex-direction: column; align-items: stretch; padding-bottom: 24px; }
-    .controls-container { min-width: 0; width: 100%; padding: 0 6%; }
-    .chart-container { min-width: 0; }
-    .modal-content { width: 92%; margin: 18% auto; }
-    button, .action-btn { padding: 12px 16px; font-size: 1rem; }
+    .nav-links li { width: 100%; text-align: center; }
+    .nav-links li a { padding: 20px; border-top: 1px solid var(--border-color); }
+    .nav-links li:last-child { border-bottom: 1px solid var(--border-color); }
+    .theme-switch-wrapper { justify-content: center; padding: 20px; }
+    .hamburger-menu.active .hamburger-bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .hamburger-menu.active .hamburger-bar:nth-child(2) { opacity: 0; }
+    .hamburger-menu.active .hamburger-bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    .about-content { flex-direction: column; }
+    .modal-content { width: 90%; }
 }
-
-/* very small screens */
-@media (max-width: 420px) {
-    #miTablero { width: min(96vw, 420px); }
-    .preview-board { width: 240px; height: 120px; }
-}
-
-/* accessibility & touch tweaks */
-#miTablero [data-square] { -webkit-tap-highlight-color: rgba(0,0,0,0); touch-action: manipulation; }
