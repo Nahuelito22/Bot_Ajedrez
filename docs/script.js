@@ -36,8 +36,6 @@ const confirmThemeBtn = document.getElementById('confirmThemeButton');
 const pieceThemeSelector = document.getElementById('pieceThemeSelector');
 var previewBoard = null;
 
-// URLs de la API
-const API_URL = "https://nahuelito22-bot-ajedrez.hf.space/predict_move";
 
 // --- 2. FUNCIONES PRINCIPALES DEL JUEGO ---
 
@@ -45,7 +43,7 @@ async function getAiMove() {
   isAiThinking = true;
   statusEl.innerHTML = "El bot está pensando...";
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(config.API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ moves: game.history() }),
@@ -282,11 +280,11 @@ if (currentTheme === 'dark') {
 }
 
 // --- 5. INICIALIZACIÓN DEL TABLERO PRINCIPAL ---
-const config = {
+const boardConfig = {
   position: 'start',
   pieceTheme: getPieceThemePath(currentPieceTheme),
 };
-board = Chessboard('miTablero', config);
+board = Chessboard('miTablero', boardConfig);
 updateStatus();
 
 document.getElementById('miTablero').addEventListener('click', handleSquareClick);
