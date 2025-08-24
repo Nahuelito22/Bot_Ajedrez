@@ -37,7 +37,7 @@ const pieceThemeSelector = document.getElementById('pieceThemeSelector');
 var previewBoard = null;
 
 // URLs de la API
-const API_URL = "http://127.0.0.1:8000/predict_move";
+const API_URL = "https://nahuelito22-bot-ajedrez.hf.space/predict_move";
 
 // --- 2. FUNCIONES PRINCIPALES DEL JUEGO ---
 
