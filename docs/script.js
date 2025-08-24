@@ -7,6 +7,7 @@ var board = null;
 var game = new Chess();
 var isAiThinking = false;
 var currentPieceTheme = 'wikipedia'; // Tema de piezas por defecto
+var currentBoardColor = 'default'; // Color del tablero por defecto
 
 // Mapa de temas de piezas y sus extensiones de archivo
 const pieceThemeExtensions = {
@@ -26,6 +27,7 @@ const pieceThemeExtensions = {
 const statusEl = document.getElementById('status');
 const pgnEl = document.getElementById('pgn');
 const modal = document.getElementById('settingsModal');
+const modalContent = document.querySelector('.modal-content');
 const settingsBtn = document.getElementById('settingsButton');
 const closeBtn = document.querySelector('.close-button');
 const toggleSwitch = document.querySelector('#checkbox');
@@ -34,7 +36,7 @@ const pieceThemeSelector = document.getElementById('pieceThemeSelector');
 var previewBoard = null;
 
 // URLs de la API
-const API_URL = "";
+const API_URL = "http://127.0.0.1:8000/predict_move";
 
 // --- 2. FUNCIONES PRINCIPALES DEL JUEGO ---
 
@@ -138,7 +140,7 @@ function getPieceThemePath(themeName) {
 
 function updatePreview(themeName) {
     const previewConfig = {
-        position: 'start',
+        position: 'rnbqkbnr/pppppppp/8/8/8/8/8/8 w - - 0 1',
         pieceTheme: getPieceThemePath(themeName)
     };
     if (previewBoard) {
@@ -147,16 +149,41 @@ function updatePreview(themeName) {
     previewBoard = Chessboard('previewBoardPieces', previewConfig);
 }
 
+function highlightSelectedColor(color) {
+    document.querySelectorAll('.color-btn').forEach(btn => {
+        if (btn.getAttribute('data-color') === color) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+}
+
+function setPreviewBoardColor(color) {
+    if (color === 'default') {
+        modalContent.removeAttribute('data-board-theme');
+    } else {
+        modalContent.setAttribute('data-board-theme', color);
+    }
+}
+
 settingsBtn.onclick = () => {
   modal.style.display = "block";
   pieceThemeSelector.value = currentPieceTheme;
   updatePreview(currentPieceTheme);
+  highlightSelectedColor(currentBoardColor);
+  setPreviewBoardColor(currentBoardColor);
 };
 
-closeBtn.onclick = () => { modal.style.display = "none"; };
+function closeModal() {
+    modal.style.display = "none";
+    modalContent.removeAttribute('data-board-theme');
+}
+
+closeBtn.onclick = closeModal;
 window.onclick = (event) => {
   if (event.target == modal) {
-    modal.style.display = "none";
+    closeModal();
   }
 };
 
@@ -165,10 +192,28 @@ pieceThemeSelector.addEventListener('change', function() {
     updatePreview(selectedTheme);
 });
 
+document.querySelectorAll('.color-btn').forEach(button => {
+  button.addEventListener('click', function() {
+    const color = this.getAttribute('data-color');
+    highlightSelectedColor(color);
+    setPreviewBoardColor(color);
+  });
+});
+
 confirmThemeBtn.addEventListener('click', () => {
+    // Aplicar tema de piezas
     const selectedTheme = pieceThemeSelector.value;
     cambiarTema(selectedTheme);
-    modal.style.display = "none";
+
+    // Aplicar color del tablero
+    currentBoardColor = modalContent.getAttribute('data-board-theme') || 'default';
+    if (currentBoardColor === 'default') {
+      document.body.removeAttribute('data-board-theme');
+    } else {
+      document.body.setAttribute('data-board-theme', currentBoardColor);
+    }
+
+    closeModal();
 });
 
 function cambiarTema(themeName) {
