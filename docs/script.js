@@ -1,5 +1,5 @@
 // ========================================================
-//     SCRIPT FINAL Y DEFINITIVO (v7 - TIEMPO PERSONALIZADO)
+//     SCRIPT FINAL Y DEFINITIVO (v8 - PREVIEW SOLO + RELOJ FIABLE)
 // ========================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
     var whiteTime, blackTime, increment;
     var activeClock = null;
     var timerIntervalId = null;
+
+    // Marca temporal del inicio del turno (ms desde epoch)
+    var turnStartTimestamp = null;
 
     const pieceThemeExtensions = {
       "alpha": "svg", "anarcandy": "svg", "caliente": "svg", "california": "svg",
@@ -84,40 +87,71 @@ document.addEventListener('DOMContentLoaded', () => {
     function startTimer() {
         if (timerIntervalId || timeControlType === 'unlimited' || game.game_over()) return;
 
-        activeClock = game.turn();
-        if (activeClock === 'w') whiteClockEl.classList.add('active-clock');
-        else blackClockEl.classList.add('active-clock');
+        activeClock = game.turn(); // 'w' o 'b'
+        whiteClockEl.classList.toggle('active-clock', activeClock === 'w');
+        blackClockEl.classList.toggle('active-clock', activeClock === 'b');
+
+        // marca del inicio del turno (para medir duración del mismo)
+        turnStartTimestamp = Date.now();
 
         let lastTime = Date.now();
         timerIntervalId = setInterval(() => {
             const now = Date.now();
-            const delta = now - lastTime;
+            // limitar delta para evitar decrementos gigantes tras sleep/hibernación
+            let delta = now - lastTime;
+            if (delta > 1000) delta = 1000;
             lastTime = now;
             let timeup = false;
 
             if (activeClock === 'w') {
+                if (!isFinite(whiteTime)) return;
                 whiteTime -= delta;
                 if (whiteTime <= 0) { whiteTime = 0; timeup = true; }
             } else {
+                if (!isFinite(blackTime)) return;
                 blackTime -= delta;
                 if (blackTime <= 0) { blackTime = 0; timeup = true; }
             }
             updateClockDisplays();
             if (timeup) {
                 stopTimer();
-                alert(`¡Se acabó el tiempo! Ganan las ${activeClock === 'w' ? 'Negras' : 'Blancas'}.`);
-                game.load('8/8/8/8/8/8/8/8 w - - 0 1'); // Clear board
+                alert(`¡Se acabó el tiempo! Ganan las ${activeClock === 'w' ? 'Blancas' : 'Negras'}.`);
+                // limpiar tablero
+                game.load('8/8/8/8/8/8/8/8 w - - 0 1');
+                if (board) board.position(game.fen());
+                updateStatus();
             }
         }, 100);
     }
 
     function switchActiveClock() {
         if (timeControlType === 'unlimited') return;
+
+        // Parar temporizador actual
         stopTimer();
+
+        // Determinar quién acaba de mover
         const justMoved = game.turn() === 'b' ? 'w' : 'b';
-        if (justMoved === 'w') whiteTime += increment;
-        else blackTime += increment;
+
+        // Calcular duración del turno del que acaba de mover
+        let moveDuration = null;
+        if (turnStartTimestamp) {
+            moveDuration = Date.now() - turnStartTimestamp; // ms
+        }
+
+        // Si hay increment configurado, aplicarlo solo si la duración del movimiento
+        // fue menor o igual al "lapso" (interpretamos el lapso == customIncrement segundos)
+        if (increment > 0 && moveDuration !== null) {
+            const windowMs = customIncrement * 1000;
+            if (moveDuration <= windowMs) {
+                if (justMoved === 'w') whiteTime += increment;
+                else blackTime += increment;
+            }
+        }
+
         updateClockDisplays();
+
+        // Iniciar el siguiente reloj (startTimer marca de inicio del turno)
         startTimer();
     }
 
@@ -132,6 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
             blackTime = Infinity;
             increment = 0;
         }
+        // reset turn start marker
+        turnStartTimestamp = null;
         updateClockDisplays();
     }
 
@@ -147,12 +183,19 @@ document.addEventListener('DOMContentLoaded', () => {
             let moveMade = false;
             for (const move of botMoves) {
                 if (game.move(move)) {
-                    board.position(game.fen());
+                    if (board) board.position(game.fen());
                     moveMade = true;
                     break;
                 }
             }
-            if (!moveMade) { const possibleMoves = game.moves(); if (possibleMoves.length > 0) { const randomIdx = Math.floor(Math.random() * possibleMoves.length); game.move(possibleMoves[randomIdx]); board.position(game.fen()); } }
+            if (!moveMade) {
+                const possibleMoves = game.moves();
+                if (possibleMoves.length > 0) {
+                    const randomIdx = Math.floor(Math.random() * possibleMoves.length);
+                    game.move(possibleMoves[randomIdx]);
+                    if (board) board.position(game.fen());
+                }
+            }
         } catch (error) {
             console.error("Error al obtener la jugada del bot:", error);
             statusEl.innerHTML = "Error al conectar con la IA.";
@@ -199,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pieceOnSquare && pieceOnSquare.color === 'w') { selectedSquare = square; highlightSquare(square); showMoveDots(square); return; }
             const move = game.move({ from: selectedSquare, to: square, promotion: 'q' });
             if (move === null) { selectedSquare = null; return; }
-            board.position(game.fen());
+            if (board) board.position(game.fen());
             updateStatus();
             selectedSquare = null;
             if (!game.game_over()) {
@@ -218,48 +261,87 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 5. AYUDAS VISUALES (PUNTOS Y RESALTADO) ---
-    function showMoveDots(square) { const moves = game.moves({ square: square, verbose: true }); moves.forEach(move => { const dot = document.createElement('div'); dot.classList.add('move-dot'); boardEl.querySelector(`[data-square=${move.to}]`).appendChild(dot); }); }
+    function showMoveDots(square) {
+        const moves = game.moves({ square: square, verbose: true });
+        moves.forEach(move => {
+            const dot = document.createElement('div');
+            dot.classList.add('move-dot');
+            const target = boardEl.querySelector(`[data-square="${move.to}"]`);
+            if (target) target.appendChild(dot);
+        });
+    }
     function removeMoveDots() { boardEl.querySelectorAll('.move-dot').forEach(dot => dot.remove()); }
     function parseRGB(rgbString) { const m = rgbString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/); return m ? [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])] : null; }
     function getLuminance(rgb) { if (!rgb) return 0; const [r, g, b] = rgb.map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; }
-    function highlightSquare(square) { const squareEl = boardEl.querySelector(`[data-square=${square}]`); if (!squareEl) return; const bg = window.getComputedStyle(squareEl).backgroundColor; const lum = getLuminance(parseRGB(bg)); const highlightColor = lum < 0.5 ? 'rgba(255, 255, 0, 0.8)' : 'rgba(204, 102, 0, 0.8)'; squareEl.style.boxShadow = `inset 0 0 2px 2px ${highlightColor}`; }
-    function unhighlightSquare(square) { const squareEl = boardEl.querySelector(`[data-square=${square}]`); if (squareEl) squareEl.style.boxShadow = ''; }
+    function highlightSquare(square) { const squareEl = boardEl.querySelector(`[data-square="${square}"]`); if (!squareEl) return; const bg = window.getComputedStyle(squareEl).backgroundColor; const rgb = parseRGB(bg); const lum = getLuminance(rgb); const highlightColor = lum < 0.5 ? 'rgba(255, 255, 0, 0.8)' : 'rgba(204, 102, 0, 0.8)'; squareEl.style.boxShadow = `inset 0 0 2px 2px ${highlightColor}`; }
+    function unhighlightSquare(square) { const squareEl = boardEl.querySelector(`[data-square="${square}"]`); if (squareEl) squareEl.style.boxShadow = ''; }
 
     // --- 6. LÓGICA DE BOTONES Y MODAL DE AJUSTES ---
     function startNewGame() {
-    game.reset();
-    if (board) {
-        board.destroy();
+        game.reset();
+        if (board) {
+            try { board.destroy(); } catch(e){ /* ignore */ }
+        }
+        const boardConfig = {
+            draggable: false,
+            position: 'start',
+            pieceTheme: getPieceThemePath(currentPieceTheme)
+        };
+        board = Chessboard('miTablero', boardConfig);
+        updateStatus();
+        if (selectedSquare) { unhighlightSquare(selectedSquare); selectedSquare = null; }
+        removeMoveDots();
+        initClocks();
     }
-    const boardConfig = {
-        draggable: false,
-        position: 'start',
-        pieceTheme: getPieceThemePath(currentPieceTheme)
-    };
-    board = Chessboard('miTablero', boardConfig);
-    updateStatus();
-    if (selectedSquare) { unhighlightSquare(selectedSquare); selectedSquare = null; }
-    removeMoveDots();
-    initClocks();
-}
 
     document.getElementById('resetButton').addEventListener('click', startNewGame);
-    document.getElementById('savePgnButton').addEventListener('click', () => { navigator.clipboard.writeText(game.pgn()).then(() => { const btn = document.getElementById('savePgnButton'); btn.innerText = '¡Copiado!'; setTimeout(() => { btn.innerText = 'Copiar Partida (PGN)'; }, 2000); }); });
-    function getPieceThemePath(themeName) { const extension = pieceThemeExtensions[themeName] || 'svg'; return `img/chesspieces/${themeName}/{piece}.${extension}`; }
-    function updatePreview(themeName) { const previewConfig = { position: 'rnbqkbnr/pppppppp/8/8/8/8/8/8 w - - 0 1', pieceTheme: getPieceThemePath(themeName) }; if (previewBoard) previewBoard.destroy(); previewBoard = Chessboard('previewBoardPieces', previewConfig); }
-    
+    document.getElementById('savePgnButton').addEventListener('click', () => {
+        navigator.clipboard.writeText(game.pgn()).then(() => {
+            const btn = document.getElementById('savePgnButton');
+            btn.innerText = '¡Copiado!';
+            setTimeout(() => { btn.innerText = 'Copiar Partida (PGN)'; }, 2000);
+        });
+    });
+
+    function getPieceThemePath(themeName) {
+        const extension = pieceThemeExtensions[themeName] || 'svg';
+        return `img/chesspieces/${themeName}/{piece}.${extension}`;
+    }
+
+    function updatePreview(themeName) {
+        const previewConfig = {
+            position: 'rnbqkbnr/pppppppp/8/8/8/8/8/8 w - - 0 1',
+            pieceTheme: getPieceThemePath(themeName)
+        };
+        if (previewBoard) {
+            try { previewBoard.destroy(); } catch(e) {}
+        }
+        previewBoard = Chessboard('previewBoardPieces', previewConfig);
+    }
+
     settingsBtn.onclick = () => {
         modal.style.display = "block";
         // Restaurar selecciones actuales
-        document.querySelector(`input[name="timeControlType"][value="${timeControlType}"]`).checked = true;
+        const timeRadio = document.querySelector(`input[name="timeControlType"][value="${timeControlType}"]`);
+        if (timeRadio) timeRadio.checked = true;
         if (timeControlType === 'custom') customTimeInputsEl.classList.remove('hidden');
         else customTimeInputsEl.classList.add('hidden');
         timeMinutesInput.value = customMinutes;
         timeSecondsInput.value = customSeconds;
         timeIncrementInput.value = customIncrement;
+
+        // piece theme select
         pieceThemeSelector.value = currentPieceTheme;
-        document.querySelector(`.color-btn[data-color="${currentBoardColor}"]`).classList.add('selected');
-        document.querySelector(`.dot-color-btn[data-dot-color="${currentDotColor}"]`).classList.add('selected');
+
+        // limpiar clases selected y luego marcar la actual, con guards
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        const boardColorBtn = document.querySelector(`.color-btn[data-color="${currentBoardColor}"]`);
+        if (boardColorBtn) boardColorBtn.classList.add('selected');
+
+        document.querySelectorAll('.dot-color-btn').forEach(b => b.classList.remove('selected'));
+        const dotColorBtn = document.querySelector(`.dot-color-btn[data-dot-color="${currentDotColor}"]`);
+        if (dotColorBtn) dotColorBtn.classList.add('selected');
+
         modalContent.setAttribute('data-board-theme', currentBoardColor);
         updatePreview(currentPieceTheme);
     };
@@ -276,25 +358,44 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (event) => { if (event.target == modal) closeModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    pieceThemeSelector.addEventListener('change', function() { updatePreview(this.value); });
-    document.querySelectorAll('.color-btn').forEach(button => { button.addEventListener('click', function() { document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected')); this.classList.add('selected'); modalContent.setAttribute('data-board-theme', this.getAttribute('data-color')); }); });
-    document.querySelectorAll('.dot-color-btn').forEach(button => { button.addEventListener('click', function() { document.querySelectorAll('.dot-color-btn').forEach(b => b.classList.remove('selected')); this.classList.add('selected'); }); });
+    // Nota importante: SOLO actualizamos la PREVIEW al cambiar el selector.
+    // No aplicamos el tema al tablero principal hasta "Aplicar y Jugar".
+    pieceThemeSelector.addEventListener('change', function() {
+        updatePreview(this.value);
+    });
+
+    document.querySelectorAll('.color-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            modalContent.setAttribute('data-board-theme', this.getAttribute('data-color'));
+        });
+    });
+
+    document.querySelectorAll('.dot-color-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.dot-color-btn').forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
 
     confirmThemeBtn.addEventListener('click', () => {
         // Guardar todos los ajustes
         currentPieceTheme = pieceThemeSelector.value;
-        currentBoardColor = document.querySelector('.color-btn.selected').getAttribute('data-color');
-        currentDotColor = document.querySelector('.dot-color-btn.selected').getAttribute('data-dot-color');
+        const selBoard = document.querySelector('.color-btn.selected');
+        if (selBoard) currentBoardColor = selBoard.getAttribute('data-color');
+        const selDot = document.querySelector('.dot-color-btn.selected');
+        if (selDot) currentDotColor = selDot.getAttribute('data-dot-color');
         timeControlType = document.querySelector('input[name="timeControlType"]:checked').value;
         customMinutes = parseInt(timeMinutesInput.value, 10) || 0;
         customSeconds = parseInt(timeSecondsInput.value, 10) || 0;
         customIncrement = parseInt(timeIncrementInput.value, 10) || 0;
 
-        // Aplicar temas visuales
+        // Aplicar temas visuales (board color y dot color)
         document.body.setAttribute('data-board-theme', currentBoardColor);
         document.body.setAttribute('data-dot-theme', currentDotColor);
 
-        // Iniciar nueva partida para aplicar todos los cambios
+        // Iniciar nueva partida para aplicar todos los cambios de tema y tiempo
         startNewGame();
         closeModal();
     });
@@ -304,7 +405,13 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleSwitch.addEventListener('change', switchTheme);
     const currentTheme = localStorage.getItem('theme');
     if (currentTheme === 'dark') { toggleSwitch.checked = true; document.body.classList.add('dark-theme'); }
-    hamburgerMenu.addEventListener('click', () => { const isActive = navLinks.classList.toggle('active'); hamburgerMenu.classList.toggle('active'); document.body.classList.toggle('body-no-scroll', isActive); });
+    if (hamburgerMenu) {
+        hamburgerMenu.addEventListener('click', () => {
+            const isActive = navLinks.classList.toggle('active');
+            hamburgerMenu.classList.toggle('active');
+            document.body.classList.toggle('body-no-scroll', isActive);
+        });
+    }
     function debounce(func, wait) { let timeout; return function executedFunction(...args) { const later = () => { clearTimeout(timeout); func(...args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; }
     window.addEventListener('resize', debounce(() => { if (board) board.resize(); }, 250));
 
