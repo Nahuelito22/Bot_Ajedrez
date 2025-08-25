@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- NUEVAS VARIABLES DEL RELOJ ---
     var timeControlType = 'unlimited'; // 'unlimited' o 'custom'
     var customMinutes = 10;
+    var customSeconds = 0;
     var customIncrement = 0;
     var whiteTime, blackTime, increment;
     var activeClock = null;
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeControlTypeRadios = document.querySelectorAll('input[name="timeControlType"]');
     const customTimeInputsEl = document.querySelector('.custom-time-inputs');
     const timeMinutesInput = document.getElementById('timeMinutes');
+    const timeSecondsInput = document.getElementById('timeSeconds');
     const timeIncrementInput = document.getElementById('timeIncrement');
     const hamburgerMenu = document.querySelector('.hamburger-menu');
     const navLinks = document.querySelector('.nav-links');
@@ -122,8 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function initClocks() {
         stopTimer();
         if (timeControlType === 'custom') {
-            whiteTime = customMinutes * 60 * 1000;
-            blackTime = customMinutes * 60 * 1000;
+            whiteTime = (customMinutes * 60 + customSeconds) * 1000;
+            blackTime = (customMinutes * 60 + customSeconds) * 1000;
             increment = customIncrement * 1000;
         } else {
             whiteTime = Infinity;
@@ -225,13 +227,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 6. LÓGICA DE BOTONES Y MODAL DE AJUSTES ---
     function startNewGame() {
-        game.reset();
-        board.start();
-        updateStatus();
-        if (selectedSquare) { unhighlightSquare(selectedSquare); selectedSquare = null; }
-        removeMoveDots();
-        initClocks();
+    game.reset();
+    if (board) {
+        board.destroy();
     }
+    const boardConfig = {
+        draggable: false,
+        position: 'start',
+        pieceTheme: getPieceThemePath(currentPieceTheme)
+    };
+    board = Chessboard('miTablero', boardConfig);
+    updateStatus();
+    if (selectedSquare) { unhighlightSquare(selectedSquare); selectedSquare = null; }
+    removeMoveDots();
+    initClocks();
+}
 
     document.getElementById('resetButton').addEventListener('click', startNewGame);
     document.getElementById('savePgnButton').addEventListener('click', () => { navigator.clipboard.writeText(game.pgn()).then(() => { const btn = document.getElementById('savePgnButton'); btn.innerText = '¡Copiado!'; setTimeout(() => { btn.innerText = 'Copiar Partida (PGN)'; }, 2000); }); });
@@ -245,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timeControlType === 'custom') customTimeInputsEl.classList.remove('hidden');
         else customTimeInputsEl.classList.add('hidden');
         timeMinutesInput.value = customMinutes;
+        timeSecondsInput.value = customSeconds;
         timeIncrementInput.value = customIncrement;
         pieceThemeSelector.value = currentPieceTheme;
         document.querySelector(`.color-btn[data-color="${currentBoardColor}"]`).classList.add('selected');
@@ -275,7 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBoardColor = document.querySelector('.color-btn.selected').getAttribute('data-color');
         currentDotColor = document.querySelector('.dot-color-btn.selected').getAttribute('data-dot-color');
         timeControlType = document.querySelector('input[name="timeControlType"]:checked').value;
-        customMinutes = parseFloat(timeMinutesInput.value); // <-- CAMBIO A parseFloat
+        customMinutes = parseInt(timeMinutesInput.value, 10) || 0;
+        customSeconds = parseInt(timeSecondsInput.value, 10) || 0;
         customIncrement = parseInt(timeIncrementInput.value, 10) || 0;
 
         // Aplicar temas visuales
@@ -297,7 +309,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', debounce(() => { if (board) board.resize(); }, 250));
 
     // --- 8. INICIALIZACIÓN ---
-    const boardConfig = { draggable: false, position: 'start', pieceTheme: getPieceThemePath(currentPieceTheme) };
-    board = Chessboard('miTablero', boardConfig);
     startNewGame();
 });
