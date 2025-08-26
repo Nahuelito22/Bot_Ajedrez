@@ -202,3 +202,32 @@ body[data-board-theme="green"] .black-3c85d, .modal-content[data-board-theme="gr
 
 /* Extra: mejorar legibilidad en tablas e imágenes pequeñas */
 img { max-width: 100%; height: auto; display:block; }
+
+/* --- 8. ESTILOS DEL MODAL DE PROMOCIÓN --- */
+.promotion-content {
+    max-width: 300px;
+    text-align: center;
+}
+
+.promotion-choices {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+}
+
+.promotion-choice {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.promotion-choice:hover {
+    background-color: var(--primary-bg);
+}
+
+.promotion-choice img {
+    width: 60px;
+    height: 60px;
+}
+

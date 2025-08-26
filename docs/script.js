@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var isAiThinking = false;
     var selectedSquare = null;
     var previewBoard = null;
+    var promotionMove = null;
 
     // Variables de personalización
     var currentPieceTheme = 'wikipedia';
@@ -48,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const whiteClockEl = document.querySelector('.player-clock');
     const blackClockEl = document.querySelector('.opponent-clock');
     const modal = document.getElementById('settingsModal');
+    const promotionModal = document.getElementById('promotionModal');
     const modalContent = document.querySelector('.modal-content');
     const settingsBtn = document.getElementById('settingsButton');
     const closeBtn = document.querySelector('.close-button');
@@ -240,16 +242,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedSquare) {
             if (selectedSquare === square) { selectedSquare = null; return; }
             if (pieceOnSquare && pieceOnSquare.color === 'w') { selectedSquare = square; highlightSquare(square); showMoveDots(square); return; }
-            const move = game.move({ from: selectedSquare, to: square, promotion: 'q' });
-            if (move === null) { selectedSquare = null; return; }
-            if (board) board.position(game.fen());
-            updateStatus();
-            selectedSquare = null;
-            if (!game.game_over()) {
-                switchActiveClock();
-                window.setTimeout(getAiMove, 250);
+            
+            // Comprobar si es un movimiento de coronación
+            const piece = game.get(selectedSquare);
+            const isPromotion = (piece.type === 'p' && ((piece.color === 'w' && selectedSquare[1] === '7' && square[1] === '8') || (piece.color === 'b' && selectedSquare[1] === '2' && square[1] === '1')));
+
+            if (isPromotion) {
+                promotionMove = { from: selectedSquare, to: square };
+                updatePromotionModal(game.turn());
+                promotionModal.style.display = "block";
             } else {
-                stopTimer();
+                const move = game.move({ from: selectedSquare, to: square });
+                if (move === null) { selectedSquare = null; return; }
+                if (board) board.position(game.fen());
+                updateStatus();
+                selectedSquare = null;
+                if (!game.game_over()) {
+                    switchActiveClock();
+                    window.setTimeout(getAiMove, 250);
+                } else {
+                    stopTimer();
+                }
             }
         } else {
             if (pieceOnSquare && pieceOnSquare.color === 'w') {
@@ -275,6 +288,28 @@ document.addEventListener('DOMContentLoaded', () => {
     function getLuminance(rgb) { if (!rgb) return 0; const [r, g, b] = rgb.map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; }
     function highlightSquare(square) { const squareEl = boardEl.querySelector(`[data-square="${square}"]`); if (!squareEl) return; const bg = window.getComputedStyle(squareEl).backgroundColor; const rgb = parseRGB(bg); const lum = getLuminance(rgb); const highlightColor = lum < 0.5 ? 'rgba(255, 255, 0, 0.8)' : 'rgba(204, 102, 0, 0.8)'; squareEl.style.boxShadow = `inset 0 0 2px 2px ${highlightColor}`; }
     function unhighlightSquare(square) { const squareEl = boardEl.querySelector(`[data-square="${square}"]`); if (squareEl) squareEl.style.boxShadow = ''; }
+
+    document.querySelectorAll('.promotion-choice').forEach(button => {
+        button.addEventListener('click', function() {
+            const piece = this.getAttribute('data-piece');
+            if (promotionMove) {
+                const move = game.move({ from: promotionMove.from, to: promotionMove.to, promotion: piece });
+                if (move) {
+                    if (board) board.position(game.fen());
+                    updateStatus();
+                    if (!game.game_over()) {
+                        switchActiveClock();
+                        window.setTimeout(getAiMove, 250);
+                    } else {
+                        stopTimer();
+                    }
+                }
+                promotionMove = null;
+                promotionModal.style.display = "none";
+                selectedSquare = null;
+            }
+        });
+    });
 
     // --- 6. LÓGICA DE BOTONES Y MODAL DE AJUSTES ---
     function startNewGame() {
@@ -306,6 +341,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function getPieceThemePath(themeName) {
         const extension = pieceThemeExtensions[themeName] || 'svg';
         return `img/chesspieces/${themeName}/{piece}.${extension}`;
+    }
+
+    function updatePromotionModal(color) {
+        const promotionChoices = document.querySelector('#promotionModal .promotion-choices');
+        const choiceElements = promotionChoices.querySelectorAll('.promotion-choice');
+        const extension = pieceThemeExtensions[currentPieceTheme] || 'svg';
+
+        choiceElements.forEach(choice => {
+            const piece = choice.getAttribute('data-piece');
+            const img = choice.querySelector('img');
+            const pieceNotation = color + piece.toUpperCase();
+            img.src = `img/chesspieces/${currentPieceTheme}/${pieceNotation}.${extension}`;
+        });
     }
 
     function updatePreview(themeName) {
