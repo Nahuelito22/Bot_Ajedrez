@@ -1,4 +1,4 @@
-/* --- 1. VARIABLES DE TEMA Y ESTILO GENERAL --- */
+/* VARIABLES DE TEMA Y ESTILO GENERAL */
 :root {
     --primary-bg: #E0F2F1;
     --secondary-bg: #FFFFFF;
@@ -35,7 +35,7 @@ body {
 
 body.body-no-scroll { overflow: hidden; }
 
-/* --- 2. BARRA DE NAVEGACIÓN Y MENÚ HAMBURGUESA --- */
+/* BARRA DE NAVEGACIÓN Y MENÚ HAMBURGUESA */
 .navbar {
     position: fixed;
     top: 0;
@@ -74,16 +74,14 @@ body.body-no-scroll { overflow: hidden; }
 
 .hamburger-menu { display: none; }
 
-/* --- 3. CONTENIDO PRINCIPAL Y TABLERO --- */
+/* CONTENIDO PRINCIPAL Y TABLERO */
 .main-section { padding: 40px 5%; min-height: 80vh; display: flex; justify-content: center; align-items: center; }
 .game-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; width: 100%; max-width: 900px; }
 #miTablero { width: 100%; max-width: 500px; }
-/* Aseguramos que las casillas donde insertamos los .move-dot sean contenedores relativos */
 #miTablero [data-square], #previewBoardPieces [data-square] { position: relative; }
 
 .controls-container { display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px; }
 
-/* Estilos para los relojes */
 .clock-display {
     font-family: monospace;
     font-size: 2.5em;
@@ -107,7 +105,7 @@ body.body-no-scroll { overflow: hidden; }
     background-color: var(--secondary-bg);
     border-radius: 8px;
     box-shadow: var(--shadow);
-    overflow: hidden; /* To keep the border-radius on the children */
+    overflow: hidden;
 }
 
 .info-box h3 {
@@ -124,14 +122,14 @@ body.body-no-scroll { overflow: hidden; }
 
 #pgn { font-family: monospace; word-wrap: break-word; max-height: 150px; overflow-y: auto; }
 
-/* --- 4. SECCIONES DE ANÁLISIS Y SOBRE EL PROYECTO --- */
+/* SECCIONES DE ANÁLISIS Y SOBRE EL PROYECTO */
 .analysis-container, .about-container { background-color: var(--secondary-bg); padding: 20px 30px; border-radius: 8px; box-shadow: var(--shadow); box-sizing: border-box; width: 100%; max-width: 900px; }
 .analysis-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 .chart-container { text-align: center; flex: 1; min-width: 0; }
 .chart-container img { max-width: 100%; height: auto; border: 1px solid var(--border-color); }
 .about-content { display: flex; gap: 20px; }
 
-/* --- 5. BOTONES Y MODAL (Modernizado) --- */
+/* BOTONES Y MODAL */
 button, .action-btn {
     padding: 12px 20px;
     border-radius: 8px;
@@ -161,7 +159,7 @@ button:active, .action-btn:active {
 }
 
 #confirmThemeButton:hover {
-    background-position: right center; /* change the direction of the change here */
+    background-position: right center;
 }
 
 .action-buttons, .options { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -170,7 +168,6 @@ button:active, .action-btn:active {
 .close-button { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
 .preview-board { width: 300px; height: 150px; margin: 10px auto; overflow: hidden; }
 
-/* Nuevos estilos para el control de tiempo personalizado */
 .time-control-options { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
 .time-control-options label { cursor: pointer; user-select: none; }
 .custom-time-inputs { display: flex; gap: 10px; justify-content: center; align-items: center; padding: 10px; background-color: var(--primary-bg); border-radius: 6px; }
@@ -179,9 +176,6 @@ button:active, .action-btn:active {
 
 .color-btn.selected { border-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
-/* El resaltado ahora se maneja vía JS para contraste dinámico */
-
-/* Estilo para los puntos de movimientos legales */
 .move-dot {
     position: absolute;
     top: 50%;
@@ -191,12 +185,11 @@ button:active, .action-btn:active {
     height: 35%;
     background-color: rgba(20, 20, 20, 0.15);
     border-radius: 50%;
-    pointer-events: none; /* Para que no interfiera con los clics */
+    pointer-events: none;
     transition: transform 0.12s ease, opacity 0.12s ease;
     opacity: 0.98;
 }
 
-/* Temas de color para los puntos */
 body[data-dot-theme="blue"] .move-dot {
     background-color: rgba(0, 123, 255, 0.5);
 }
@@ -209,29 +202,24 @@ body[data-dot-theme="green"] .move-dot {
 
 .dot-color-btn.selected { border-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
-/* --- 6. ESTILOS DEL TABLERO Y RESALTADO --- */
-/* Default Theme */
+/* ESTILOS DEL TABLERO Y RESALTADO */
 .white-1e1d7 { background-color: #f0d9b5; }
 .black-3c85d { background-color: #b58863; }
 
-/* Grayscale Theme */
 body[data-board-theme="grayscale"] .white-1e1d7, .modal-content[data-board-theme="grayscale"] .white-1e1d7 { background-color: #e1e1e1; }
 body[data-board-theme="grayscale"] .black-3c85d, .modal-content[data-board-theme="grayscale"] .black-3c85d { background-color: #aaaaaa; }
 
-/* Blue Theme */
 body[data-board-theme="blue"] .white-1e1d7, .modal-content[data-board-theme="blue"] .white-1e1d7 { background-color: #dee3e6; }
 body[data-board-theme="blue"] .black-3c85d, .modal-content[data-board-theme="blue"] .black-3c85d { background-color: #8ca2ad; }
 
-/* Green Theme */
 body[data-board-theme="green"] .white-1e1d7, .modal-content[data-board-theme="green"] .white-1e1d7 { background-color: #ffffdd; }
 body[data-board-theme="green"] .black-3c85d, .modal-content[data-board-theme="green"] .black-3c85d { background-color: #86a666; }
 
 .color-btn.selected { border-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
-/* El resaltado dinámico aplica box-shadow; añadimos transición para suavizarlo */
 #miTablero [data-square], #previewBoardPieces [data-square] { transition: box-shadow 0.12s ease; }
 
-/* --- 7. ESTILOS RESPONSIVE --- */
+/* ESTILOS RESPONSIVE */
 @media (max-width: 768px) {
     .hamburger-menu { display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 25px; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1100; }
     .hamburger-bar { display: block; width: 100%; height: 3px; background-color: var(--text-color); border-radius: 2px; transition: all var(--transition-speed) ease-in-out; }
@@ -248,10 +236,9 @@ body[data-board-theme="green"] .black-3c85d, .modal-content[data-board-theme="gr
     .modal-content { width: 90%; }
 }
 
-/* Extra: mejorar legibilidad en tablas e imágenes pequeñas */
 img { max-width: 100%; height: auto; display:block; }
 
-/* --- 8. ESTILOS DEL MODAL DE PROMOCIÓN --- */
+/* ESTILOS DEL MODAL DE PROMOCIÓN */
 .promotion-content {
     max-width: 300px;
     text-align: center;
@@ -279,7 +266,7 @@ img { max-width: 100%; height: auto; display:block; }
     height: 60px;
 }
 
-/* --- Theme Switcher --- */
+/* Theme Switcher */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;

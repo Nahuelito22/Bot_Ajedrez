@@ -1,10 +1,6 @@
-// ========================================================
-//     SCRIPT FINAL Y DEFINITIVO (v8 - PREVIEW SOLO + RELOJ FIABLE)
-// ========================================================
-
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. VARIABLES GLOBALES E INICIALIZACIÓN ---
+    // VARIABLES GLOBALES E INICIALIZACIÓN
     var board = null;
     var game = new Chess();
     var isAiThinking = false;
@@ -12,13 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     var previewBoard = null;
     var promotionMove = null;
 
-    // Variables de personalización
     var currentPieceTheme = 'wikipedia';
     var currentBoardColor = 'default';
     var currentDotColor = 'default';
     
-    // --- NUEVAS VARIABLES DEL RELOJ ---
-    var timeControlType = 'unlimited'; // 'unlimited' o 'custom'
+    var timeControlType = 'unlimited';
     var customMinutes = 10;
     var customSeconds = 0;
     var customIncrement = 0;
@@ -26,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     var activeClock = null;
     var timerIntervalId = null;
 
-    // Marca temporal del inicio del turno (ms desde epoch)
     var turnStartTimestamp = null;
 
     const pieceThemeExtensions = {
@@ -42,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
       "staunty": "svg", "tatiana": "svg", "uscf": "png", "wikipedia": "png", "xkcd": "svg"
     };
 
-    // Referencias a elementos del DOM
     const boardEl = document.getElementById('miTablero');
     const statusEl = document.getElementById('status');
     const pgnEl = document.getElementById('pgn');
@@ -64,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hamburgerMenu = document.querySelector('.hamburger-menu');
     const navLinks = document.querySelector('.nav-links');
 
-    // --- 2. LÓGICA DEL RELOJ ---
+    // LÓGICA DEL RELOJ
     function formatTime(ms) {
         if (timeControlType === 'unlimited') return "--:--";
         const totalSeconds = Math.ceil(ms / 1000);
@@ -89,17 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function startTimer() {
         if (timerIntervalId || timeControlType === 'unlimited' || game.game_over()) return;
 
-        activeClock = game.turn(); // 'w' o 'b'
+        activeClock = game.turn();
         whiteClockEl.classList.toggle('active-clock', activeClock === 'w');
         blackClockEl.classList.toggle('active-clock', activeClock === 'b');
 
-        // marca del inicio del turno (para medir duración del mismo)
         turnStartTimestamp = Date.now();
 
         let lastTime = Date.now();
         timerIntervalId = setInterval(() => {
             const now = Date.now();
-            // limitar delta para evitar decrementos gigantes tras sleep/hibernación
             let delta = now - lastTime;
             if (delta > 1000) delta = 1000;
             lastTime = now;
@@ -118,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeup) {
                 stopTimer();
                 alert(`¡Se acabó el tiempo! Ganan las ${activeClock === 'w' ? 'Blancas' : 'Negras'}.`);
-                // limpiar tablero
                 game.load('8/8/8/8/8/8/8/8 w - - 0 1');
                 if (board) board.position(game.fen());
                 updateStatus();
@@ -129,20 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchActiveClock() {
         if (timeControlType === 'unlimited') return;
 
-        // Parar temporizador actual
         stopTimer();
 
-        // Determinar quién acaba de mover
         const justMoved = game.turn() === 'b' ? 'w' : 'b';
 
-        // Calcular duración del turno del que acaba de mover
         let moveDuration = null;
         if (turnStartTimestamp) {
-            moveDuration = Date.now() - turnStartTimestamp; // ms
+            moveDuration = Date.now() - turnStartTimestamp;
         }
 
-        // Si hay increment configurado, aplicarlo solo si la duración del movimiento
-        // fue menor o igual al "lapso" (interpretamos el lapso == customIncrement segundos)
         if (increment > 0 && moveDuration !== null) {
             const windowMs = customIncrement * 1000;
             if (moveDuration <= windowMs) {
@@ -153,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateClockDisplays();
 
-        // Iniciar el siguiente reloj (startTimer marca de inicio del turno)
         startTimer();
     }
 
@@ -168,12 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
             blackTime = Infinity;
             increment = 0;
         }
-        // reset turn start marker
         turnStartTimestamp = null;
         updateClockDisplays();
     }
 
-    // --- 3. LÓGICA DEL BOT (API) ---
+    // LÓGICA DEL BOT (API)
     async function getAiMove() {
         isAiThinking = true;
         statusEl.innerHTML = "El bot está pensando...";
@@ -224,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pgnEl.innerHTML = game.pgn();
     }
 
-    // --- 4. LÓGICA DE MOVIMIENTOS ---
+    // LÓGICA DE MOVIMIENTOS
     boardEl.addEventListener('click', (e) => {
         const squareEl = e.target.closest('[data-square]');
         if (squareEl) {
@@ -235,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleBoardClick(square) {
         if (isAiThinking || game.turn() !== 'w') return;
-        if (game.history().length === 0 && timeControlType === 'custom') startTimer(); // Iniciar reloj en la primera jugada
+        if (game.history().length === 0 && timeControlType === 'custom') startTimer();
         const pieceOnSquare = game.get(square);
         removeMoveDots();
         if(selectedSquare) unhighlightSquare(selectedSquare);
@@ -243,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedSquare === square) { selectedSquare = null; return; }
             if (pieceOnSquare && pieceOnSquare.color === 'w') { selectedSquare = square; highlightSquare(square); showMoveDots(square); return; }
             
-            // Comprobar si es un movimiento de coronación
             const piece = game.get(selectedSquare);
             const isPromotion = (piece.type === 'p' && ((piece.color === 'w' && selectedSquare[1] === '7' && square[1] === '8') || (piece.color === 'b' && selectedSquare[1] === '2' && square[1] === '1')));
 
@@ -273,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 5. AYUDAS VISUALES (PUNTOS Y RESALTADO) ---
+    // AYUDAS VISUALES
     function showMoveDots(square) {
         const moves = game.moves({ square: square, verbose: true });
         moves.forEach(move => {
@@ -311,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 6. LÓGICA DE BOTONES Y MODAL DE AJUSTES ---
+    // LÓGICA DE BOTONES Y MODAL
     function startNewGame() {
         game.reset();
         if (board) {
@@ -369,7 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     settingsBtn.onclick = () => {
         modal.style.display = "block";
-        // Restaurar selecciones actuales
         const timeRadio = document.querySelector(`input[name="timeControlType"][value="${timeControlType}"]`);
         if (timeRadio) timeRadio.checked = true;
         if (timeControlType === 'custom') customTimeInputsEl.classList.remove('hidden');
@@ -378,10 +358,8 @@ document.addEventListener('DOMContentLoaded', () => {
         timeSecondsInput.value = customSeconds;
         timeIncrementInput.value = customIncrement;
 
-        // piece theme select
         pieceThemeSelector.value = currentPieceTheme;
 
-        // limpiar clases selected y luego marcar la actual, con guards
         document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
         const boardColorBtn = document.querySelector(`.color-btn[data-color="${currentBoardColor}"]`);
         if (boardColorBtn) boardColorBtn.classList.add('selected');
@@ -406,8 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (event) => { if (event.target == modal) closeModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    // Nota importante: SOLO actualizamos la PREVIEW al cambiar el selector.
-    // No aplicamos el tema al tablero principal hasta "Aplicar y Jugar".
     pieceThemeSelector.addEventListener('change', function() {
         updatePreview(this.value);
     });
@@ -428,7 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     confirmThemeBtn.addEventListener('click', () => {
-        // Guardar todos los ajustes
         currentPieceTheme = pieceThemeSelector.value;
         const selBoard = document.querySelector('.color-btn.selected');
         if (selBoard) currentBoardColor = selBoard.getAttribute('data-color');
@@ -439,16 +414,14 @@ document.addEventListener('DOMContentLoaded', () => {
         customSeconds = parseInt(timeSecondsInput.value, 10) || 0;
         customIncrement = parseInt(timeIncrementInput.value, 10) || 0;
 
-        // Aplicar temas visuales (board color y dot color)
         document.body.setAttribute('data-board-theme', currentBoardColor);
         document.body.setAttribute('data-dot-theme', currentDotColor);
 
-        // Iniciar nueva partida para aplicar todos los cambios de tema y tiempo
         startNewGame();
         closeModal();
     });
 
-    // --- 7. TEMA OSCURO, MENÚ HAMBURGUESA Y RESIZE ---
+    // TEMA OSCURO, MENÚ HAMBURGUESA Y RESIZE
     function switchTheme(e) { document.body.classList.toggle('dark-theme', e.target.checked); localStorage.setItem('theme', e.target.checked ? 'dark' : 'light'); }
     toggleSwitch.addEventListener('change', switchTheme);
     const currentTheme = localStorage.getItem('theme');
@@ -463,6 +436,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function debounce(func, wait) { let timeout; return function executedFunction(...args) { const later = () => { clearTimeout(timeout); func(...args); }; clearTimeout(timeout); timeout = setTimeout(later, wait); }; }
     window.addEventListener('resize', debounce(() => { if (board) board.resize(); }, 250));
 
-    // --- 8. INICIALIZACIÓN ---
+    // INICIALIZACIÓN
     startNewGame();
 });
