@@ -1,9 +1,10 @@
 /* --- 1. VARIABLES DE TEMA Y ESTILO GENERAL --- */
 :root {
-    --primary-bg: #f0f0f0;
-    --secondary-bg: #ffffff;
-    --text-color: #333333;
-    --border-color: #ddd;
+    --primary-bg: #E0F2F1;
+    --secondary-bg: #FFFFFF;
+    --text-color: #004D40;
+    --border-color: #B2DFDB;
+    --accent-color: #00796B;
     --shadow: 0 2px 4px rgba(0,0,0,0.1);
     --slider-bg: #ccc;
     --modal-backdrop: rgba(0,0,0,0.6);
@@ -12,10 +13,11 @@
 }
 
 body.dark-theme {
-    --primary-bg: #1a202c;
-    --secondary-bg: #2d3748;
-    --text-color: #f7fafc;
-    --border-color: #4a5568;
+    --primary-bg: #011627;
+    --secondary-bg: #011a32;
+    --text-color: #FDFFFC;
+    --border-color: #023e8a;
+    --accent-color: #2EC4B6;
     --shadow: 0 2px 4px rgba(0,0,0,0.4);
     --slider-bg: #4a5568;
 }
@@ -96,7 +98,7 @@ body.body-no-scroll { overflow: hidden; }
 }
 
 .clock-display.active-clock {
-    border-color: #2196F3; /* Un borde azul para indicar el reloj activo */
+    border-color: var(--accent-color);
     background-color: var(--secondary-bg);
     transform: scale(1.02);
 }
@@ -175,7 +177,7 @@ button:active, .action-btn:active {
 .time-input { width: 60px; text-align: center; font-family: monospace; font-size: 1em; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--secondary-bg); color: var(--text-color); }
 .hidden { display: none; }
 
-.color-btn.selected { border-color: #2196F3; box-shadow: 0 0 5px #2196F3; }
+.color-btn.selected { border-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
 /* El resaltado ahora se maneja vía JS para contraste dinámico */
 
@@ -205,10 +207,7 @@ body[data-dot-theme="green"] .move-dot {
     background-color: rgba(40, 167, 69, 0.5);
 }
 
-.dot-color-btn.selected {
-    border-color: #2196F3;
-    box-shadow: 0 0 5px #2196F3;
-}
+.dot-color-btn.selected { border-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
 /* --- 6. ESTILOS DEL TABLERO Y RESALTADO --- */
 /* Default Theme */
@@ -227,7 +226,7 @@ body[data-board-theme="blue"] .black-3c85d, .modal-content[data-board-theme="blu
 body[data-board-theme="green"] .white-1e1d7, .modal-content[data-board-theme="green"] .white-1e1d7 { background-color: #ffffdd; }
 body[data-board-theme="green"] .black-3c85d, .modal-content[data-board-theme="green"] .black-3c85d { background-color: #86a666; }
 
-.color-btn.selected { border-color: #2196F3; box-shadow: 0 0 5px #2196F3; }
+.color-btn.selected { border-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
 
 /* El resaltado dinámico aplica box-shadow; añadimos transición para suavizarlo */
 #miTablero [data-square], #previewBoardPieces [data-square] { transition: box-shadow 0.12s ease; }
@@ -278,4 +277,76 @@ img { max-width: 100%; height: auto; display:block; }
 .promotion-choice img {
     width: 60px;
     height: 60px;
+}
+
+/* --- Theme Switcher --- */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider .theme-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: all .4s;
+}
+
+.slider .theme-icon img {
+    width: 20px;
+    height: 20px;
+}
+
+.slider .theme-icon {
+    left: 6px;
+}
+
+input:checked + .slider .theme-icon {
+    left: 34px;
 }
