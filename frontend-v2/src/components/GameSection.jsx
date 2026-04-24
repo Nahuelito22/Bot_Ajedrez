@@ -82,32 +82,44 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                 
                 {/* COLUMNA 1: JUGADORES */}
                 <div className="players-column">
-                    <div className="player-info opponent-info glass-card">
-                        <div className="player-details" style={{ marginBottom: '10px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                {gameMode === 'pvai' ? <Bot size={20} color="#cfb168"/> : <User size={20} color="#cfb168"/>}
-                                <h3>{gameMode === 'pvai' ? 'Roque Chess AI' : 'Jugador 2 (Negras)'}</h3>
+                    
+                    {/* SECCIÓN SUPERIOR (IA / JUGADOR 2) */}
+                    <div className="player-section top-player" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <div className="player-info opponent-info glass-card">
+                            <div className="player-details">
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                    {gameMode === 'pvai' ? <Bot size={20} color="#cfb168"/> : <User size={20} color="#cfb168"/>}
+                                    <h3 style={{ margin: 0 }}>{gameMode === 'pvai' ? 'Roque Chess AI' : 'Jugador 2 (Negras)'}</h3>
+                                </div>
+                                <p style={{ textAlign: 'center', margin: '5px 0 0 0', fontSize: '0.9em', opacity: 0.8 }}>
+                                    {gameMode === 'pvai' ? 'Evaluación Posicional Avanzada' : 'Humano'}
+                                </p>
+                                {isThinking && <div className="thinking-indicator" style={{ marginTop: '10px' }}>Pensando...</div>}
                             </div>
-                            <p style={{ textAlign: 'center' }}>{gameMode === 'pvai' ? 'Evaluación Posicional Avanzada' : 'Humano'}</p>
-                            {isThinking && <div className="thinking-indicator">Pensando...</div>}
                         </div>
+                        
                         <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'b') ? 'active-clock' : ''}`}>
                             {formatTime(blackTime)}
                         </div>
                     </div>
 
-                    <div className="player-info user-info glass-card">
-                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'w') ? 'active-clock' : ''}`} style={{ marginBottom: '10px' }}>
+                    {/* SECCIÓN INFERIOR (TÚ / JUGADOR 1) */}
+                    <div className="player-section bottom-player" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'w') ? 'active-clock' : ''}`}>
                             {formatTime(whiteTime)}
                         </div>
-                        <div className="player-details">
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                <User size={20} color="#cfb168"/>
-                                <h3>Jugador 1 (Blancas)</h3>
+
+                        <div className="player-info user-info glass-card">
+                            <div className="player-details">
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                    <User size={20} color="#cfb168"/>
+                                    <h3 style={{ margin: 0 }}>Jugador 1 (Blancas)</h3>
+                                </div>
+                                <p style={{ textAlign: 'center', margin: '5px 0 0 0', fontSize: '0.9em', opacity: 0.8 }}>Tú</p>
                             </div>
-                            <p style={{ textAlign: 'center' }}>Tú</p>
                         </div>
                     </div>
+                    
                 </div>
 
                 {/* COLUMNA 2: TABLERO */}
