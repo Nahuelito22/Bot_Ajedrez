@@ -141,8 +141,8 @@ export default function AIAnalysisSection() {
                                     position={fen} 
                                     onPieceDrop={onDrop}
                                     boardOrientation="white"
-                                    customDarkSquareStyle={{ backgroundColor: 'var(--board-dark)' }}
-                                    customLightSquareStyle={{ backgroundColor: 'var(--board-light)' }}
+                                    customDarkSquareStyle={{ backgroundColor: '#b58863' }}
+                                    customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
                                     animationDuration={300}
                                 />
                             </div>
