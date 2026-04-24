@@ -14,7 +14,7 @@ const LAYOUT_CONFIG = {
     player1Clock: { width: '210px', height: '50px', marginBottom: '25px' },
     player1Info: { width: '210px', height: '130px' },
     board: { width: '500px', maxWidth: '600px' },
-    statusCard: { width: '240px', minHeight: '130px' },
+    statusCard: { width: '240px', minHeight: '140px' },
     controlsCard: { width: '240px', minHeight: '250px' },
     controlTitleMarginTop: '-5px', // Ajusta este valor para mover el texto "Controles" hacia arriba o abajo
     historyCard: { width: '190px', height: '450px' },
