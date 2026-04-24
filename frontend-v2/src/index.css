@@ -95,8 +95,8 @@ body.body-no-scroll { overflow: hidden; }
 
 .game-container { 
     display: grid;
-    grid-template-columns: 250px minmax(400px, 500px) 250px 250px;
-    gap: 20px; 
+    grid-template-columns: 250px minmax(400px, 500px) 300px 230px;
+    gap: 15px; 
     width: 100%; 
     max-width: 1400px;
     margin: 0 auto;
@@ -128,13 +128,19 @@ body.body-no-scroll { overflow: hidden; }
     gap: 20px; 
 }
 
+.grid-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
 .history-column {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1350px) {
     .game-container {
         grid-template-columns: 250px minmax(350px, 500px) 250px;
     }
