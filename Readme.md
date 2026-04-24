@@ -1,8 +1,15 @@
-# Bot de Ajedrez con Redes Neuronales LSTM ♟️
+# Roque Chess V1 - Un Bot de Ajedrez con IA ♟️
 
-Un bot de ajedrez diseñado para jugar con un estilo "humano", aprendiendo de una base de datos de 1 millón de partidas de jugadores de alto nivel (2000+ ELO) de la plataforma Lichess.
+**[➡️ JUGAR DEMO EN VIVO ⬅️](https://nahuelito22.github.io/Bot_Ajedrez/docs/)**
 
-A diferencia de los motores de ajedrez tradicionales como Stockfish que se basan en la fuerza bruta y el cálculo de árboles de búsqueda, este proyecto utiliza una **Red Neuronal Recurrente (LSTM)** para predecir el siguiente movimiento más probable, imitando la intuición y el conocimiento posicional de jugadores experimentados.
+**Roque Chess** es un bot de ajedrez diseñado para jugar con un estilo "humano", aprendiendo de una base de datos de **1 millón de partidas** de jugadores de alto nivel (2000+ ELO) de la plataforma Lichess.
+
+A diferencia de los motores tradicionales que se basan en el cálculo bruto, este proyecto utiliza una **Red Neuronal Recurrente (LSTM)** para predecir el siguiente movimiento más probable, imitando la intuición y el conocimiento posicional de jugadores experimentados.
+
+![Captura de pantalla del juego](docs/assets/captura_de_pantalla.png) 
+
+
+---
 
 ## 🌟 Características
 
@@ -12,11 +19,14 @@ A diferencia de los motores de ajedrez tradicionales como Stockfish que se basan
 * **Interfaz Web V2 (React):** Una interfaz de usuario moderna y premium con soporte para temas, gestión de tiempos y una experiencia de juego fluida.
 * **Dashboard de Análisis de IA:** Visualización interactiva en tiempo real del modelo LSTM, mostrando las 10 mejores predicciones y métricas de inferencia.
 
+## 🔬 Análisis del Modelo
 
+Se realizó un análisis exhaustivo del rendimiento del modelo (`modelo_epoch_07.keras`) para determinar su fuerza y estilo de juego.
 
-## 🏗️ Arquitectura del Proyecto
+### Rendimiento General
+El bot demuestra un conocimiento de nivel experto en las aperturas y una precisión casi perfecta en los finales, pero es tácticamente vulnerable en el medio juego.
 
-El proyecto está diseñado con una arquitectura moderna de tres componentes principales:
+![Gráfico de Rendimiento Promedio](docs/assets/grafico_de_rendimiento.png)
 
 1.  **Modelo de IA (`model.py`):** La red neuronal construida con TensorFlow/Keras que constituye el cerebro del bot (3.48M parámetros).
 2.  **Backend (`main.py`):** Un servidor web construido con **FastAPI** desplegado en Hugging Face que expone el modelo mediante una API RESTful.
@@ -30,20 +40,19 @@ El proyecto está diseñado con una arquitectura moderna de tres componentes pri
 * **Entorno:** JupyterLab, Google Colab (para entrenamiento con GPU)
 * **Frontend:** React 18, Vite, Framer Motion (animaciones), Lucide React (iconos)
 
-## 🚀 Instalación y Configuración Local
+---
 
-Para configurar el entorno y ejecutar el proyecto localmente, sigue estos pasos:
+## 🚀 Instalación y Uso Local
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [https://www.youtube.com/watch?v=3fn7ApOWE1k](https://www.youtube.com/watch?v=3fn7ApOWE1k)
+    git clone [https://github.com/Nahuelito22/Bot_Ajedrez.git](https://github.com/Nahuelito22/Bot_Ajedrez.git)
     cd Bot_Ajedrez
     ```
 
 2.  **Crear y activar un entorno virtual:**
     ```bash
-    # Se recomienda usar Python 3.11
-    py -3.11 -m venv venv
+    py -3.12.10 -m venv venv
     venv\Scripts\activate
     ```
 
@@ -52,15 +61,26 @@ Para configurar el entorno y ejecutar el proyecto localmente, sigue estos pasos:
     pip install -r requirements.txt
     ```
 
-## ⚙️ Uso
+4.  **Ejecutar los servidores locales:**
+    * **Terminal 1 (Backend):** `uvicorn main:app --reload`
+    * **Terminal 2 (Frontend):** `cd docs` y luego `py -m http.server 8001`
+    * Abrí tu navegador en `http://localhost:8001`.
 
-### Entrenamiento
+---
 
-El entrenamiento es un proceso intensivo que se realiza en un entorno con GPU (como Google Colab o Kaggle). El script `train.py` está preparado para reanudar el entrenamiento desde checkpoints.
+## 🙏 Agradecimientos y Créditos
 
-```bash
-# Para iniciar un nuevo entrenamiento
-python train.py --data_path "ruta/a/tus/datos"
+Este proyecto fue posible gracias a una increíble cantidad de herramientas y comunidades de código abierto:
 
-# Para reanudar desde un checkpoint
-python train.py --data_path "ruta/a/tus/datos" --resume_from "ruta/a/checkpoints/modelo_epoch_XX.keras"
+* **Dataset:** [Lichess Open Database](https://database.lichess.org/) por proveer millones de partidas.
+* **Frontend:** [chessboard.js](https://chessboardjs.com/) y [chess.js](https://github.com/jhlywa/chess.js) por las fantásticas librerías para la interfaz.
+* **Medición de Elo:** [Cute Chess](https://cutechess.com/) como el gestor de torneos, [Stockfish](https://stockfishchess.org/) como el motor de referencia, y [Ordo](https://github.com/michiguel/Ordo) para el cálculo de ratings.
+* **Desarrollo:** Agradecimientos a las comunidades detrás de Python, FastAPI, TensorFlow y todas las librerías que hacen posible la IA moderna.
+* **Formación:** Este proyecto fue la entrega final para la carrera de **Data Science** en [Coderhouse](https://www.coderhouse.com/). En primera instancia fue una simple RNN, pero con el tiempo se busco terminarlo y poder hacer un deploy un poco mas serio y robusto.
+
+---
+
+## ✍️ Autor
+
+**Matias Nahuel Ghilardi Salinas**
+* **GitHub:** [@Nahuelito22](https://github.com/Nahuelito22)
