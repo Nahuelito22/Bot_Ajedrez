@@ -393,6 +393,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
             this.classList.add('selected');
             modalContent.setAttribute('data-board-theme', this.getAttribute('data-color'));
+            setTimeout(() => {
+                updatePreview(pieceThemeSelector.value);
+            }, 0);
         });
     });
 
@@ -421,11 +424,49 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal();
     });
 
-    // TEMA OSCURO, MENÚ HAMBURGUESA Y RESIZE
-    function switchTheme(e) { document.body.classList.toggle('dark-theme', e.target.checked); localStorage.setItem('theme', e.target.checked ? 'dark' : 'light'); }
+    // SPA NAVEGACIÓN Y TEMA OSCURO
+    const navLinksList = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.main-section');
+
+    navLinksList.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const targetId = link.getAttribute('data-target');
+            if(!targetId) return; // Si no tiene target, es un enlace externo (ej. GitHub)
+            
+            e.preventDefault();
+            
+            // Actualizar enlaces
+            navLinksList.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+
+            // Actualizar secciones
+            sections.forEach(sec => {
+                sec.classList.remove('section-active');
+                if(sec.id === targetId) {
+                    sec.classList.add('section-active');
+                }
+            });
+
+            // Cerrar menú móvil
+            if (navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                hamburgerMenu.classList.remove('active');
+                document.body.classList.remove('body-no-scroll');
+            }
+        });
+    });
+
+    function switchTheme(e) { document.body.classList.toggle('light-theme', !e.target.checked); localStorage.setItem('theme', e.target.checked ? 'dark' : 'light'); }
     toggleSwitch.addEventListener('change', switchTheme);
     const currentTheme = localStorage.getItem('theme');
-    if (currentTheme === 'dark') { toggleSwitch.checked = true; document.body.classList.add('dark-theme'); }
+    if (currentTheme === 'light') { 
+        toggleSwitch.checked = false; 
+        document.body.classList.add('light-theme'); 
+    } else { 
+        toggleSwitch.checked = true; 
+        document.body.classList.remove('light-theme'); 
+    }
+
     if (hamburgerMenu) {
         hamburgerMenu.addEventListener('click', () => {
             const isActive = navLinks.classList.toggle('active');

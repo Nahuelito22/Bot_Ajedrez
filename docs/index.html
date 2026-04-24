@@ -10,17 +10,17 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-brand">Bot de Ajedrez LSTM</div>
+        <div class="nav-brand"><span class="brand-accent">Roque</span> Chess</div>
         <button class="hamburger-menu" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
             <span class="hamburger-bar"></span>
             <span class="hamburger-bar"></span>
             <span class="hamburger-bar"></span>
         </button>
         <ul id="main-nav" class="nav-links" role="navigation">
-            <li><a href="#jugar">Jugar</a></li>
-            <li><a href="#analisis">Análisis del Modelo</a></li>
-            <li><a href="#proyecto">Sobre el Proyecto</a></li>
-            <li><a href="https://github.com/Nahuelito22/Bot_Ajedrez" target="_blank" rel="noopener">Código Fuente</a></li>
+            <li><a href="#jugar" class="nav-link active" data-target="jugar">Jugar</a></li>
+            <li><a href="#analisis" class="nav-link" data-target="analisis">Análisis del Modelo</a></li>
+            <li><a href="#proyecto" class="nav-link" data-target="proyecto">Sobre el Proyecto</a></li>
+            <li><a href="https://github.com/Nahuelito22/Bot_Ajedrez" target="_blank" rel="noopener" class="nav-link">Código Fuente</a></li>
             <li>
                 <div class="theme-switch-wrapper">
                     <label class="theme-switch" for="checkbox">
@@ -36,16 +36,16 @@
         </ul>
     </nav>
 
-    <section id="jugar" class="main-section">
+    <section id="jugar" class="main-section section-active">
         <div class="game-container">
             <div id="miTablero"></div>
             <div class="controls-container">
-                <div class="clock-display opponent-clock">--:--</div>
-                <div class="info-box">
+                <div class="clock-display opponent-clock glass-card">--:--</div>
+                <div class="info-box glass-card">
                     <h3>Estado del Juego</h3>
                     <p id="status"></p>
                 </div>
-                <div class="info-box">
+                <div class="info-box glass-card">
                     <h3>Historial (PGN)</h3>
                     <p id="pgn"></p>
                 </div>
@@ -54,37 +54,51 @@
                     <button id="savePgnButton">Copiar Partida (PGN)</button>
                     <button id="settingsButton">🎨 Ajustes</button>
                 </div>
-                <div class="clock-display player-clock">--:--</div>
+                <div class="clock-display player-clock glass-card">--:--</div>
             </div>
         </div>
     </section>
 
     <section id="analisis" class="main-section">
-        <div class="analysis-container">
-            <div class="chart-container">
-                <h3>Rendimiento Promedio vs. Etapa del Juego</h3>
-                <img src="../notebooks/grafico_de_rendimiento.png" alt="Gráfico de Rendimiento Promedio">
-            </div>
-            <div class="chart-container">
-                <h3>Calidad Táctica (Pérdida de Centipeones)</h3>
-                <img src="../notebooks/grafico_de_errores.png" alt="Gráfico de Pérdida de Centipeones">
+        <div class="analysis-container glass-panel">
+            <h2 class="section-title">Análisis del Modelo</h2>
+            <div class="dashboard-grid">
+                <div class="chart-container glass-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">📈</span>
+                        <h3>Rendimiento Promedio</h3>
+                    </div>
+                    <img src="img/grafico_de_rendimiento.png" alt="Gráfico de Rendimiento Promedio">
+                    <p class="chart-description">Evolución del desempeño del bot en las diferentes etapas de la partida (Apertura, Medio Juego, Final).</p>
+                </div>
+                <div class="chart-container glass-card">
+                    <div class="chart-header">
+                        <span class="chart-icon">🎯</span>
+                        <h3>Calidad Táctica</h3>
+                    </div>
+                    <img src="img/grafico_de_errores.png" alt="Gráfico de Pérdida de Centipeones">
+                    <p class="chart-description">Análisis de la pérdida de centipeones. Refleja la precisión del modelo en comparación con los motores tradicionales.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <section id="proyecto" class="main-section">
-         <div class="about-container">
-            <h2>Sobre este Proyecto</h2>
-            <div class="about-content">
-                <div class="about-section">
+         <div class="about-container glass-panel">
+            <h2 class="section-title">Sobre este Proyecto</h2>
+            <div class="about-grid">
+                <div class="about-card glass-card fade-up-element">
+                    <div class="card-icon">💡</div>
                     <h3>Inspiración</h3>
                     <p>Este proyecto nace de la fascinación por el ajedrez y la inteligencia artificial. A diferencia de los motores tradicionales que se basan en el cálculo bruto, el objetivo era crear un bot que jugara con un estilo "humano", imitando la intuición y el reconocimiento de patrones de un jugador experimentado.</p>
                 </div>
-                <div class="about-section">
+                <div class="about-card glass-card fade-up-element" style="animation-delay: 0.1s;">
+                    <div class="card-icon">⚙️</div>
                     <h3>El Desafío Técnico</h3>
-                    <p>El cerebro del bot es una Red Neuronal Recurrente (LSTM) construida con TensorFlow y Keras. Fue entrenado sobre un dataset de 1 millón de partidas de jugadores de alto nivel (2000+ ELO). Se utilizaron técnicas de Procesamiento de Lenguaje Natural (NLP) para tratar cada partida como una "frase" y cada jugada como una "palabra", permitiendo al modelo aprender la gramática y el estilo del ajedrez de élite.</p>
+                    <p>El cerebro del bot es una Red Neuronal Recurrente (LSTM) construida con TensorFlow y Keras. Fue entrenado sobre un dataset de 1 millón de partidas de jugadores de alto nivel (2000+ ELO). Se utilizaron técnicas de Procesamiento de Lenguaje Natural (NLP) para tratar cada partida como una "frase" y cada jugada como una "palabra".</p>
                 </div>
-                <div class="about-section">
+                <div class="about-card glass-card fade-up-element" style="animation-delay: 0.2s;">
+                    <div class="card-icon">🎓</div>
                     <h3>Entrega Final Coderhouse</h3>
                     <p>Este bot de ajedrez fue desarrollado como el proyecto final para la carrera de Data Science de Coderhouse, aplicando los conocimientos adquiridos en Machine Learning, Deep Learning y despliegue de modelos.</p>
                 </div>
