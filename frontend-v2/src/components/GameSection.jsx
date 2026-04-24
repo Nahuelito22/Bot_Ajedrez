@@ -2,20 +2,25 @@ import { Chessboard } from 'react-chessboard';
 import { RotateCcw, Undo2 } from 'lucide-react';
 import { useChessGame } from '../hooks/useChessGame';
 
-export default function GameSection() {
+export default function GameSection({ boardTheme }) {
     const {
         fen,
         isThinking,
         status,
         gameHistory,
         onDrop,
+        onSquareClick,
+        optionSquares,
         resetGame,
-        undoMove,
-        isGameOver
+        undoMove
     } = useChessGame();
 
+    // Colores por defecto si no hay tema seleccionado
+    const lightSquareStyle = boardTheme ? { backgroundColor: boardTheme.light } : { backgroundColor: '#f0d9b5' };
+    const darkSquareStyle = boardTheme ? { backgroundColor: boardTheme.dark } : { backgroundColor: '#b58863' };
+
     return (
-        <section id="jugar" className="main-section section-active">
+        <section id="jugar" className="main-section">
             <div className="game-container glass-panel fade-up-element">
                 
                 <div className="left-panel">
@@ -36,8 +41,8 @@ export default function GameSection() {
                             onSquareClick={onSquareClick}
                             customSquareStyles={optionSquares}
                             boardOrientation="white"
-                            customDarkSquareStyle={{ backgroundColor: 'var(--black-square)' }}
-                            customLightSquareStyle={{ backgroundColor: 'var(--white-square)' }}
+                            customDarkSquareStyle={darkSquareStyle}
+                            customLightSquareStyle={lightSquareStyle}
                             animationDuration={200}
                         />
                     </div>
