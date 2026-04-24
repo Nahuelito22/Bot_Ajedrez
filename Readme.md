@@ -13,22 +13,11 @@ A diferencia de los motores tradicionales que se basan en el cálculo bruto, est
 
 ## 🌟 Características
 
-La aplicación web cuenta con una interfaz completa y personalizable:
-
-* **Juego Interactivo:** Jugá directamente contra el bot en tu navegador.
-* **Controles de Tiempo:** Configurá partidas con minutos e incremento por jugada.
-* **Personalización Visual:**
-    * **41 Estilos de Piezas:** Elegí entre una vasta colección de sets de piezas.
-    * **Selector de Color de Tablero:** Múltiples temas de colores para el tablero.
-    * **Modo Claro y Oscuro:** Adaptá la interfaz a tu preferencia.
-    * **Punto de movimientos validos:** Personalizacion de colores.
-* **Funcionalidades de Juego:**
-    * Historial de la partida en formato PGN.
-    * Botón para copiar el PGN al portapapeles.
-    * Botón de "Nueva Partida".
-    * Botón de personalizació visual.
-
----
+* **Modelo Predictivo LSTM:** El núcleo del bot es una red neuronal profunda que analiza secuencias de movimientos para predecir la siguiente jugada.
+* **Entrenamiento de Alta Calidad:** Entrenado sobre un corpus masivo y filtrado de partidas de grandes maestros y jugadores titulados.
+* **API para Jugabilidad:** El modelo se expondrá a través de una API RESTful para facilitar la integración con diferentes interfaces.
+* **Interfaz Web V2 (React):** Una interfaz de usuario moderna y premium con soporte para temas, gestión de tiempos y una experiencia de juego fluida.
+* **Dashboard de Análisis de IA:** Visualización interactiva en tiempo real del modelo LSTM, mostrando las 10 mejores predicciones y métricas de inferencia.
 
 ## 🔬 Análisis del Modelo
 
@@ -39,23 +28,17 @@ El bot demuestra un conocimiento de nivel experto en las aperturas y una precisi
 
 ![Gráfico de Rendimiento Promedio](docs/assets/grafico_de_rendimiento.png)
 
-### Calidad Táctica
-El análisis de **Pérdida de Centipeones** revela una personalidad de "cañón de cristal": el bot tiene una profunda comprensión posicional (pérdida promedio negativa de -55cp), pero comete errores tácticos graves (picos altos) que son castigados por motores tradicionales.
-
-![Gráfico de Pérdida de Centipeones](docs/assets/grafico_de_errores.png)
-
-* **Elo Táctico Estimado:** Basado en la calidad promedio de sus jugadas, se estima una fuerza posicional de **~1555 Elo**.
-
----
+1.  **Modelo de IA (`model.py`):** La red neuronal construida con TensorFlow/Keras que constituye el cerebro del bot (3.48M parámetros).
+2.  **Backend (`main.py`):** Un servidor web construido con **FastAPI** desplegado en Hugging Face que expone el modelo mediante una API RESTful.
+3.  **Frontend V2 (`frontend-v2`):** Una aplicación de alto rendimiento construida con **React + Vite**, utilizando `Chess.js` para la lógica y `react-chessboard` para la visualización, con un sistema de diseño basado en Glassmorphism.
 
 ## 🛠️ Stack Tecnológico
 
-* **Machine Learning:** Python, TensorFlow, Keras, Scikit-learn, Pandas,Numpy.
-* **Backend:** FastAPI (API), Uvicorn (Servidor).
-* **Frontend:** HTML, CSS, JavaScript.
-* **Análisis y Medición de Elo:** Cute Chess, Stockfish, Ordo.
-* **Librerías de Ajedrez:** `python-chess` (backend), `chessboard.js` y `chess.js` (frontend).
-* **Despliegue:** Hugging Face Spaces (backend), GitHub Pages (frontend).
+* **Backend:** Python 3.11, FastAPI (Desplegado en Hugging Face Spaces)
+* **Machine Learning:** TensorFlow, Keras, NumPy, Scikit-learn
+* **Manejo de Lógica de Ajedrez:** `python-chess` / `chess.js`
+* **Entorno:** JupyterLab, Google Colab (para entrenamiento con GPU)
+* **Frontend:** React 18, Vite, Framer Motion (animaciones), Lucide React (iconos)
 
 ---
 
