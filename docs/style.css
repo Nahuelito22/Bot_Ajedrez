@@ -14,15 +14,15 @@
 }
 
 body.light-theme {
-    --primary-bg: #E0F2F1;
+    --primary-bg: #f9fafb;
     --secondary-bg: #FFFFFF;
-    --text-color: #004D40;
-    --border-color: #B2DFDB;
-    --accent-color: #00796B;
-    --shadow: 0 2px 4px rgba(0,0,0,0.1);
-    --slider-bg: #ccc;
+    --text-color: #1f2937;
+    --border-color: rgba(207, 177, 104, 0.3);
+    --accent-color: #cfb168;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --slider-bg: #e5e7eb;
     --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(0, 0, 0, 0.05);
+    --glass-border: rgba(207, 177, 104, 0.1);
 }
 
 html { scroll-behavior: smooth; }
