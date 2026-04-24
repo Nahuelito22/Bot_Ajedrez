@@ -41,7 +41,6 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Formatear tiempo
     const formatTime = (seconds) => {
         if (timeControl === 'unlimited') return "--:--";
         const m = Math.floor(seconds / 60);
@@ -49,25 +48,21 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
-    // Copiar PGN
     const handleCopyPGN = () => {
         const pgn = getPGN();
         navigator.clipboard.writeText(pgn);
         alert('Partida (PGN) copiada al portapapeles!');
     };
 
-    // Manejar cambio de modo
     const toggleGameMode = () => {
         const newMode = gameMode === 'pvai' ? 'pvp' : 'pvai';
         setGameMode(newMode);
-        resetGame(); // Reiniciar partida al cambiar modo
+        resetGame();
     };
 
-    // Colores por defecto si no hay tema seleccionado
     const lightSquareStyle = boardTheme ? { backgroundColor: boardTheme.light } : { backgroundColor: '#f0d9b5' };
     const darkSquareStyle = boardTheme ? { backgroundColor: boardTheme.dark } : { backgroundColor: '#b58863' };
 
-    // Custom pieces
     const pieces = ['wP', 'wN', 'wB', 'wR', 'wQ', 'wK', 'bP', 'bN', 'bB', 'bR', 'bQ', 'bK'];
     const customPieces = {};
     pieces.forEach(p => {
@@ -82,10 +77,9 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                 
                 {/* COLUMNA 1: JUGADORES */}
                 <div className="players-column">
-                    
                     {/* SECCIÓN SUPERIOR (IA / JUGADOR 2) */}
-                    <div className="player-section top-player" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <div className="player-info opponent-info glass-card">
+                    <div className="player-section top-player" style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
+                        <div className="player-info opponent-info glass-card" style={{ width: '250px', height: '163px' }}>
                             <div className="player-details">
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                     {gameMode === 'pvai' ? <Bot size={20} color="#cfb168"/> : <User size={20} color="#cfb168"/>}
@@ -98,18 +92,18 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                             </div>
                         </div>
                         
-                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'b') ? 'active-clock' : ''}`}>
+                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'b') ? 'active-clock' : ''}`} style={{ width: '252px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {formatTime(blackTime)}
                         </div>
                     </div>
 
                     {/* SECCIÓN INFERIOR (TÚ / JUGADOR 1) */}
-                    <div className="player-section bottom-player" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'w') ? 'active-clock' : ''}`}>
+                    <div className="player-section bottom-player" style={{ display: 'flex', flexDirection: 'column', gap: '19px' }}>
+                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'w') ? 'active-clock' : ''}`} style={{ width: '250px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {formatTime(whiteTime)}
                         </div>
 
-                        <div className="player-info user-info glass-card">
+                        <div className="player-info user-info glass-card" style={{ width: '250px', height: '150px' }}>
                             <div className="player-details">
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                     <User size={20} color="#cfb168"/>
@@ -119,7 +113,6 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                             </div>
                         </div>
                     </div>
-                    
                 </div>
 
                 {/* COLUMNA 2: TABLERO */}
@@ -192,6 +185,7 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                 </div>
 
             </div>
+
             <TimeModal 
                 isOpen={isTimeModalOpen}
                 onClose={() => setIsTimeModalOpen(false)}
