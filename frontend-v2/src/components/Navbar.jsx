@@ -42,6 +42,15 @@ export default function Navbar({ activeSection, setActiveSection, appTheme, setA
                 </li>
                 <li>
                     <a 
+                        href="#ai_analisis" 
+                        className={`nav-link ${activeSection === 'ai_analisis' ? 'active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); handleNavClick('ai_analisis'); }}
+                    >
+                        Análisis de IA
+                    </a>
+                </li>
+                <li>
+                    <a 
                         href="#proyecto" 
                         className={`nav-link ${activeSection === 'proyecto' ? 'active' : ''}`}
                         onClick={(e) => { e.preventDefault(); handleNavClick('proyecto'); }}

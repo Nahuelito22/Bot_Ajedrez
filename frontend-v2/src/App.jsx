@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import GameSection from './components/GameSection';
 import AnalysisSection from './components/AnalysisSection';
+import AIAnalysisSection from './components/AIAnalysisSection';
 import AboutSection from './components/AboutSection';
 import Modal from './components/Modal';
 import SettingsModal from './components/SettingsModal';
@@ -45,6 +46,7 @@ function App() {
             <main className="content-container">
                 {activeSection === 'jugar' && <GameSection boardTheme={boardTheme} pieceTheme={pieceTheme} onOpenSettings={() => setIsSettingsOpen(true)} />}
                 {activeSection === 'analisis' && <AnalysisSection onOpenModal={openModal} />}
+                {activeSection === 'ai_analisis' && <AIAnalysisSection />}
                 {activeSection === 'proyecto' && <AboutSection />}
             </main>
 
