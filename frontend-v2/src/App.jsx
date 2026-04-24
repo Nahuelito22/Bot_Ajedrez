@@ -10,10 +10,10 @@ function App() {
     const [activeSection, setActiveSection] = useState('jugar');
     const [modalData, setModalData] = useState({ isOpen: false, imgSrc: '', title: '', description: '' });
     
-    // Configuración global
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [appTheme, setAppTheme] = useState(localStorage.getItem('theme') || 'dark');
     const [boardTheme, setBoardTheme] = useState({ id: 'default', name: 'Clásico', light: '#f0d9b5', dark: '#b58863' });
+    const [pieceTheme, setPieceTheme] = useState('wikipedia');
 
     useEffect(() => {
         if (appTheme === 'light') {
@@ -38,11 +38,12 @@ function App() {
             <Navbar 
                 activeSection={activeSection} 
                 setActiveSection={setActiveSection} 
-                onOpenSettings={() => setIsSettingsOpen(true)}
+                appTheme={appTheme}
+                setAppTheme={setAppTheme}
             />
             
             <main className="content-container">
-                {activeSection === 'jugar' && <GameSection boardTheme={boardTheme} />}
+                {activeSection === 'jugar' && <GameSection boardTheme={boardTheme} pieceTheme={pieceTheme} onOpenSettings={() => setIsSettingsOpen(true)} />}
                 {activeSection === 'analisis' && <AnalysisSection onOpenModal={openModal} />}
                 {activeSection === 'proyecto' && <AboutSection />}
             </main>
@@ -60,6 +61,8 @@ function App() {
                 onClose={() => setIsSettingsOpen(false)}
                 boardTheme={boardTheme}
                 setBoardTheme={setBoardTheme}
+                pieceTheme={pieceTheme}
+                setPieceTheme={setPieceTheme}
                 appTheme={appTheme}
                 setAppTheme={setAppTheme}
             />
