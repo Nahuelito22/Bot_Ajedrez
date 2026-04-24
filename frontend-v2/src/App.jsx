@@ -1,13 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import GameSection from './components/GameSection';
 import AnalysisSection from './components/AnalysisSection';
 import AboutSection from './components/AboutSection';
 import Modal from './components/Modal';
+import SettingsModal from './components/SettingsModal';
 
 function App() {
     const [activeSection, setActiveSection] = useState('jugar');
     const [modalData, setModalData] = useState({ isOpen: false, imgSrc: '', title: '', description: '' });
+    
+    // Configuración global
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [appTheme, setAppTheme] = useState(localStorage.getItem('theme') || 'dark');
+    const [boardTheme, setBoardTheme] = useState({ id: 'default', name: 'Clásico', light: '#f0d9b5', dark: '#b58863' });
+
+    useEffect(() => {
+        if (appTheme === 'light') {
+            document.body.classList.add('light-theme');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.body.classList.remove('light-theme');
+            localStorage.setItem('theme', 'dark');
+        }
+    }, [appTheme]);
 
     const openModal = (imgSrc, title, description) => {
         setModalData({ isOpen: true, imgSrc, title, description });
@@ -19,10 +35,14 @@ function App() {
 
     return (
         <>
-            <Navbar activeSection={activeSection} setActiveSection={setActiveSection} />
+            <Navbar 
+                activeSection={activeSection} 
+                setActiveSection={setActiveSection} 
+                onOpenSettings={() => setIsSettingsOpen(true)}
+            />
             
             <main className="content-container">
-                {activeSection === 'jugar' && <GameSection />}
+                {activeSection === 'jugar' && <GameSection boardTheme={boardTheme} />}
                 {activeSection === 'analisis' && <AnalysisSection onOpenModal={openModal} />}
                 {activeSection === 'proyecto' && <AboutSection />}
             </main>
@@ -33,6 +53,15 @@ function App() {
                 title={modalData.title}
                 imgSrc={modalData.imgSrc}
                 description={modalData.description}
+            />
+
+            <SettingsModal
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
+                boardTheme={boardTheme}
+                setBoardTheme={setBoardTheme}
+                appTheme={appTheme}
+                setAppTheme={setAppTheme}
             />
         </>
     );

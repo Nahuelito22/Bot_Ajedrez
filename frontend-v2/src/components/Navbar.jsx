@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { Settings } from 'lucide-react';
 
-export default function Navbar({ activeSection, setActiveSection }) {
+export default function Navbar({ activeSection, setActiveSection, onOpenSettings }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleNavClick = (section) => {
@@ -49,9 +50,14 @@ export default function Navbar({ activeSection, setActiveSection }) {
                     </a>
                 </li>
                 <li>
-                    <a href="https://github.com/Nahuelito22/Bot_Ajedrez" target="_blank" rel="noopener noreferrer" className="nav-link">
-                        <i className="fab fa-github"></i> GitHub
-                    </a>
+                    <button 
+                        onClick={onOpenSettings} 
+                        className="action-btn" 
+                        style={{ padding: '8px', marginLeft: '10px', background: 'transparent', boxShadow: 'none', color: 'var(--text-color)' }}
+                        title="Configuración"
+                    >
+                        <Settings size={20} />
+                    </button>
                 </li>
             </ul>
         </nav>
