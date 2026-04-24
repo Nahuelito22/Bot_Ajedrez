@@ -2,8 +2,8 @@
     --primary-bg: #0b0f19;
     --secondary-bg: #111827;
     --text-color: #f3f4f6;
-    --border-color: rgba(49, 196, 190, 0.2);
-    --accent-color: #31C4BE;
+    --border-color: rgba(207, 177, 104, 0.2);
+    --accent-color: #cfb168;
     --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     --slider-bg: #374151;
     --modal-backdrop: rgba(0,0,0,0.8);
@@ -56,7 +56,7 @@ body.body-no-scroll { overflow: hidden; }
 }
 
 .nav-brand { font-size: 1.8em; font-weight: 800; letter-spacing: -0.5px; }
-.brand-accent { color: var(--accent-color); text-shadow: 0 0 10px rgba(49, 196, 190, 0.4); }
+.brand-accent { color: var(--accent-color); text-shadow: 0 0 10px rgba(207, 177, 104, 0.4); }
 
 .nav-links {
     list-style: none;
@@ -78,7 +78,7 @@ body.body-no-scroll { overflow: hidden; }
 }
 
 .nav-links li a:hover, .nav-links li a.active {
-    background-color: rgba(49, 196, 190, 0.1);
+    background-color: rgba(207, 177, 104, 0.1);
     color: var(--accent-color);
 }
 
@@ -142,7 +142,7 @@ body.body-no-scroll { overflow: hidden; }
 .section-title { width: 100%; text-align: center; margin-bottom: 30px; font-size: 2.2em; color: var(--text-color); }
 .glass-panel { background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 40px; box-shadow: var(--shadow); width: 100%; max-width: 1000px; }
 .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); border-radius: 12px; padding: 25px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.glass-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); border-color: rgba(49, 196, 190, 0.3); }
+.glass-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); border-color: rgba(207, 177, 104, 0.3); }
 
 .analysis-container { display: flex; flex-direction: column; align-items: center; }
 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; }
@@ -169,19 +169,19 @@ button, .action-btn {
     padding: 12px 20px;
     border-radius: 8px;
     border: none;
-    background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+    background-image: linear-gradient(to right, #8a6d3b 0%, #cfb168 100%);
     color: white;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    box-shadow: 0 4px 15px 0 rgba(207, 177, 104, 0.3);
 }
 
 button:hover, .action-btn:hover {
-    background-image: linear-gradient(to right, #2575fc 0%, #6a11cb 100%);
+    background-image: linear-gradient(to right, #cfb168 0%, #8a6d3b 100%);
     transform: scale(1.05);
-    box-shadow: 0 6px 20px 0 rgba(49, 196, 190, 0.5);
+    box-shadow: 0 6px 20px 0 rgba(207, 177, 104, 0.4);
 }
 
 button:active, .action-btn:active {
@@ -189,8 +189,8 @@ button:active, .action-btn:active {
 }
 
 #confirmThemeButton {
-    background-image: linear-gradient(to right, #fcb045 0%, #fd1d1d 51%, #fcb045 100%);
-    box-shadow: 0 4px 15px 0 rgba(252, 104, 110, 0.75);
+    background-image: linear-gradient(to right, #cfb168 0%, #8a6d3b 51%, #cfb168 100%);
+    box-shadow: 0 4px 15px 0 rgba(207, 177, 104, 0.4);
 }
 
 #confirmThemeButton:hover {
