@@ -13,6 +13,13 @@ export function useChessGame() {
     const [optionSquares, setOptionSquares] = useState({});
     const [moveFrom, setMoveFrom] = useState('');
 
+    const [gameMode, setGameMode] = useState('pvai'); // 'pvai' | 'pvp'
+    const [timeControl, setTimeControl] = useState('unlimited'); // 'unlimited' | 'custom'
+    const [whiteTime, setWhiteTime] = useState(600); // en segundos
+    const [blackTime, setBlackTime] = useState(600);
+    const [increment, setIncrement] = useState(0);
+    const [isTimerRunning, setIsTimerRunning] = useState(false);
+
     const updateUI = useCallback(() => {
         setFen(game.fen());
         setGameHistory(game.history());
@@ -30,13 +37,29 @@ export function useChessGame() {
                 statusText += `, las ${moveColor} están en Jaque.`;
             }
         }
+        
+        if (whiteTime === 0 && timeControl !== 'unlimited') {
+            statusText = 'Juego terminado, ganan las negras por tiempo.';
+        } else if (blackTime === 0 && timeControl !== 'unlimited') {
+            statusText = 'Juego terminado, ganan las blancas por tiempo.';
+        }
+
         setStatus(statusText);
-    }, [game]);
+    }, [game, whiteTime, blackTime, timeControl]);
 
     const makeMove = useCallback((move) => {
         try {
+            const currentTurn = game.turn();
             const result = game.move(move);
             if (result) {
+                if (timeControl !== 'unlimited' && increment > 0 && !game.isGameOver()) {
+                    if (currentTurn === 'w') {
+                        setWhiteTime(prev => prev + increment);
+                    } else {
+                        setBlackTime(prev => prev + increment);
+                    }
+                }
+                if (!isTimerRunning) setIsTimerRunning(true);
                 updateUI();
                 return true;
             }
@@ -44,7 +67,7 @@ export function useChessGame() {
             console.warn("Movimiento inválido detectado:", e.message);
         }
         return false;
-    }, [game, updateUI]);
+    }, [game, updateUI, timeControl, increment, isTimerRunning]);
 
     const getAiMove = useCallback(async () => {
         if (game.isGameOver() || game.turn() === 'w') return;
@@ -75,14 +98,41 @@ export function useChessGame() {
     }, [game, makeMove]);
 
     useEffect(() => {
-        if (game.turn() === 'b' && !game.isGameOver() && !isThinking) {
+        if (gameMode === 'pvai' && game.turn() === 'b' && !game.isGameOver() && !isThinking) {
             const timer = setTimeout(getAiMove, 500);
             return () => clearTimeout(timer);
         }
-    }, [game, isThinking, getAiMove]);
+    }, [game, fen, isThinking, getAiMove, gameMode]);
+
+    useEffect(() => {
+        let interval;
+        if (isTimerRunning && timeControl !== 'unlimited' && !game.isGameOver() && whiteTime > 0 && blackTime > 0) {
+            interval = setInterval(() => {
+                const currentTurn = game.turn();
+                if (currentTurn === 'w') {
+                    setWhiteTime((prev) => {
+                        if (prev <= 1) {
+                            setIsTimerRunning(false);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                } else {
+                    setBlackTime((prev) => {
+                        if (prev <= 1) {
+                            setIsTimerRunning(false);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [isTimerRunning, timeControl, fen, whiteTime, blackTime]);
 
     const onDrop = (sourceSquare, targetSquare) => {
-        if (game.turn() === 'b' || isThinking) return false;
+        if ((gameMode === 'pvai' && game.turn() === 'b') || isThinking || whiteTime === 0 || blackTime === 0) return false;
 
         const result = makeMove({
             from: sourceSquare,
@@ -99,7 +149,7 @@ export function useChessGame() {
     };
 
     const onSquareClick = (square) => {
-        if (game.turn() === 'b' || isThinking) return;
+        if ((gameMode === 'pvai' && game.turn() === 'b') || isThinking || whiteTime === 0 || blackTime === 0) return;
 
         // Intentar mover si ya hay una pieza seleccionada
         if (moveFrom) {
@@ -132,6 +182,7 @@ export function useChessGame() {
 
     const resetGame = () => {
         game.reset();
+        setIsTimerRunning(false);
         updateUI();
         setMoveFrom('');
         setOptionSquares({});
@@ -140,10 +191,14 @@ export function useChessGame() {
     const undoMove = () => {
         if (game.history().length < 2) return;
         game.undo();
-        game.undo();
+        if (gameMode === 'pvai') game.undo(); // Undo 2 if against AI
         updateUI();
         setMoveFrom('');
         setOptionSquares({});
+    };
+
+    const getPGN = () => {
+        return game.pgn();
     };
 
     return {
@@ -156,6 +211,13 @@ export function useChessGame() {
         optionSquares,
         resetGame,
         undoMove,
-        isGameOver: game.isGameOver()
+        getPGN,
+        isGameOver: game.isGameOver() || (timeControl !== 'unlimited' && (whiteTime === 0 || blackTime === 0)),
+        gameMode, setGameMode,
+        timeControl, setTimeControl,
+        whiteTime, setWhiteTime,
+        blackTime, setBlackTime,
+        increment, setIncrement,
+        isTimerRunning, setIsTimerRunning
     };
 }
