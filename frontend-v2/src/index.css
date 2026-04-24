@@ -90,9 +90,7 @@ body.body-no-scroll { overflow: hidden; }
     min-height: calc(100vh - var(--nav-height)); 
     display: flex; 
     justify-content: center; 
-    align-items: flex-start; 
-    animation: fadeIn 0.5s forwards;
-    overflow-x: hidden;
+    align-items: flex-start;
 }
 
 .game-container { 
@@ -113,12 +111,8 @@ body.body-no-scroll { overflow: hidden; }
 
 .board-wrapper { 
     width: 100%; 
-    aspect-ratio: 1 / 1;
     max-width: 500px; 
-    position: relative; /* CRÍTICO para el drag and drop */
-    box-shadow: var(--shadow);
-    border-radius: 8px;
-    overflow: hidden;
+    position: relative;
 }
 
 .right-panel { 

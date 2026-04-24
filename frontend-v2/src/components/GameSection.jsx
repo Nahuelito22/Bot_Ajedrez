@@ -37,7 +37,7 @@ export default function GameSection({ boardTheme }) {
 
     return (
         <section id="jugar" className="main-section">
-            <div className="game-container glass-panel fade-up-element">
+            <div className="game-container">
                 
                 <div className="left-panel">
                     <div className="player-info bot-info glass-card">
