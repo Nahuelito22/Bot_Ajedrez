@@ -49,25 +49,18 @@ export function useChessGame() {
         setStatus("El bot está pensando...");
 
         try {
-            // Reemplaza esta URL por la correcta si es diferente
             const API_URL = "https://nahuelito22-bot-ajedrez.hf.space/predict_move"; 
             const response = await fetch(API_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fen: game.fen() })
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const data = await response.json();
             if (data && data.best_move) {
                 makeMove(data.best_move);
-            } else {
-                console.error("No se recibió 'best_move' del bot:", data);
             }
         } catch (error) {
             console.error("Error al obtener jugada del bot:", error);
@@ -77,15 +70,79 @@ export function useChessGame() {
         }
     }, [game, makeMove]);
 
-    // Disparar movimiento de IA cuando sea el turno de las negras
     useEffect(() => {
         if (game.turn() === 'b' && !game.isGameOver() && !isThinking) {
-            const timeoutId = setTimeout(() => {
-                getAiMove();
-            }, 500); // Pequeño retraso para que se vea más natural
+            const timeoutId = setTimeout(() => getAiMove(), 500);
             return () => clearTimeout(timeoutId);
         }
     }, [game, isThinking, getAiMove]);
+
+    // Lógica para Drag & Drop y Click-to-Move
+    const [moveFrom, setMoveFrom] = useState('');
+    const [optionSquares, setOptionSquares] = useState({});
+
+    function getMoveOptions(square) {
+        const moves = game.moves({ square, verbose: true });
+        if (moves.length === 0) {
+            setOptionSquares({});
+            return false;
+        }
+
+        const newSquares = {};
+        moves.map((move) => {
+            newSquares[move.to] = {
+                background: game.get(move.to) && game.get(move.to).color !== game.get(square).color
+                    ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)'
+                    : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
+                borderRadius: '50%'
+            };
+            return move;
+        });
+        newSquares[square] = { background: 'rgba(255, 255, 0, 0.4)' };
+        setOptionSquares(newSquares);
+        return true;
+    }
+
+    const onSquareClick = (square) => {
+        // No permitir hacer click si el bot piensa o le toca al bot
+        if (game.turn() === 'b' || isThinking) return;
+
+        // Limpiar estilos anteriores
+        setOptionSquares({});
+
+        // Si ya seleccionamos una pieza de origen
+        if (moveFrom) {
+            const move = {
+                from: moveFrom,
+                to: square,
+                promotion: 'q' // Siempre promocionar a reina en esta versión
+            };
+
+            const isValidMove = makeMove(move);
+            
+            if (!isValidMove) {
+                // Si el movimiento falló pero hicimos click en otra de nuestras piezas, seleccionarla
+                if (game.get(square) && game.get(square).color === game.turn()) {
+                    setMoveFrom(square);
+                    getMoveOptions(square);
+                    return;
+                }
+                setMoveFrom('');
+                setOptionSquares({});
+                return;
+            }
+
+            setMoveFrom('');
+            setOptionSquares({});
+            return;
+        }
+
+        // Si no hemos seleccionado origen, intentar seleccionar pieza
+        if (game.get(square) && game.get(square).color === game.turn()) {
+            setMoveFrom(square);
+            getMoveOptions(square);
+        }
+    };
 
     const onDrop = (sourceSquare, targetSquare) => {
         if (game.turn() === 'b' || isThinking) return false;
@@ -93,24 +150,33 @@ export function useChessGame() {
         const move = {
             from: sourceSquare,
             to: targetSquare,
-            promotion: 'q', // siempre promociona a reina por ahora, se puede mejorar
+            promotion: 'q'
         };
 
-        return makeMove(move);
+        const result = makeMove(move);
+        if (result) {
+            setMoveFrom('');
+            setOptionSquares({});
+        }
+        return result;
     };
 
     const resetGame = () => {
         const newGame = new Chess();
         setGame(newGame);
+        setMoveFrom('');
+        setOptionSquares({});
         updateStatus(newGame);
     };
 
     const undoMove = () => {
         if (gameHistory.length < 2) return;
         const gameCopy = new Chess(game.fen());
-        gameCopy.undo(); // Deshacer el de la IA
-        gameCopy.undo(); // Deshacer el del jugador
+        gameCopy.undo(); 
+        gameCopy.undo(); 
         setGame(gameCopy);
+        setMoveFrom('');
+        setOptionSquares({});
         updateStatus(gameCopy);
     };
 
@@ -120,6 +186,8 @@ export function useChessGame() {
         status,
         gameHistory,
         onDrop,
+        onSquareClick,
+        optionSquares,
         resetGame,
         undoMove,
         isGameOver: game.isGameOver()

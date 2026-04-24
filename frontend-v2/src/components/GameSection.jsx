@@ -33,6 +33,8 @@ export default function GameSection() {
                             id="BasicBoard" 
                             position={fen} 
                             onPieceDrop={onDrop}
+                            onSquareClick={onSquareClick}
+                            customSquareStyles={optionSquares}
                             boardOrientation="white"
                             customDarkSquareStyle={{ backgroundColor: 'var(--black-square)' }}
                             customLightSquareStyle={{ backgroundColor: 'var(--white-square)' }}
