@@ -3,7 +3,6 @@ import { Chess } from 'chess.js';
 
 export function useChessGame() {
     const [game, setGame] = useState(new Chess());
-    const [fen, setFen] = useState(game.fen());
     const [isThinking, setIsThinking] = useState(false);
     const [status, setStatus] = useState('Turno de las blancas');
     const [gameHistory, setGameHistory] = useState([]);
@@ -23,13 +22,12 @@ export function useChessGame() {
             }
         }
         setStatus(statusText);
-        setFen(currentGame.fen());
         setGameHistory(currentGame.history());
     }, []);
 
     const makeMove = useCallback((move) => {
-        const gameCopy = new Chess(game.fen());
         try {
+            const gameCopy = new Chess(game.fen());
             const result = gameCopy.move(move);
             if (result) {
                 setGame(gameCopy);
@@ -37,6 +35,7 @@ export function useChessGame() {
                 return true;
             }
         } catch (e) {
+            console.warn("Movimiento inválido:", e.message);
             return false;
         }
         return false;
@@ -60,6 +59,7 @@ export function useChessGame() {
 
             const data = await response.json();
             if (data && data.best_move) {
+                // El bot devuelve el movimiento en formato SAN o objeto, makeMove lo maneja
                 makeMove(data.best_move);
             }
         } catch (error) {
@@ -72,77 +72,14 @@ export function useChessGame() {
 
     useEffect(() => {
         if (game.turn() === 'b' && !game.isGameOver() && !isThinking) {
-            const timeoutId = setTimeout(() => getAiMove(), 500);
-            return () => clearTimeout(timeoutId);
+            const timer = setTimeout(getAiMove, 500);
+            return () => clearTimeout(timer);
         }
     }, [game, isThinking, getAiMove]);
 
-    // Lógica para Drag & Drop y Click-to-Move
+    // Lógica de interacción
     const [moveFrom, setMoveFrom] = useState('');
     const [optionSquares, setOptionSquares] = useState({});
-
-    function getMoveOptions(square) {
-        const moves = game.moves({ square, verbose: true });
-        if (moves.length === 0) {
-            setOptionSquares({});
-            return false;
-        }
-
-        const newSquares = {};
-        moves.map((move) => {
-            newSquares[move.to] = {
-                background: game.get(move.to) && game.get(move.to).color !== game.get(square).color
-                    ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)'
-                    : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
-                borderRadius: '50%'
-            };
-            return move;
-        });
-        newSquares[square] = { background: 'rgba(255, 255, 0, 0.4)' };
-        setOptionSquares(newSquares);
-        return true;
-    }
-
-    const onSquareClick = (square) => {
-        // No permitir hacer click si el bot piensa o le toca al bot
-        if (game.turn() === 'b' || isThinking) return;
-
-        // Limpiar estilos anteriores
-        setOptionSquares({});
-
-        // Si ya seleccionamos una pieza de origen
-        if (moveFrom) {
-            const move = {
-                from: moveFrom,
-                to: square,
-                promotion: 'q' // Siempre promocionar a reina en esta versión
-            };
-
-            const isValidMove = makeMove(move);
-            
-            if (!isValidMove) {
-                // Si el movimiento falló pero hicimos click en otra de nuestras piezas, seleccionarla
-                if (game.get(square) && game.get(square).color === game.turn()) {
-                    setMoveFrom(square);
-                    getMoveOptions(square);
-                    return;
-                }
-                setMoveFrom('');
-                setOptionSquares({});
-                return;
-            }
-
-            setMoveFrom('');
-            setOptionSquares({});
-            return;
-        }
-
-        // Si no hemos seleccionado origen, intentar seleccionar pieza
-        if (game.get(square) && game.get(square).color === game.turn()) {
-            setMoveFrom(square);
-            getMoveOptions(square);
-        }
-    };
 
     const onDrop = (sourceSquare, targetSquare) => {
         if (game.turn() === 'b' || isThinking) return false;
@@ -161,35 +98,60 @@ export function useChessGame() {
         return result;
     };
 
-    const resetGame = () => {
-        const newGame = new Chess();
-        setGame(newGame);
-        setMoveFrom('');
-        setOptionSquares({});
-        updateStatus(newGame);
-    };
+    const onSquareClick = (square) => {
+        if (game.turn() === 'b' || isThinking) return;
 
-    const undoMove = () => {
-        if (gameHistory.length < 2) return;
-        const gameCopy = new Chess(game.fen());
-        gameCopy.undo(); 
-        gameCopy.undo(); 
-        setGame(gameCopy);
-        setMoveFrom('');
-        setOptionSquares({});
-        updateStatus(gameCopy);
+        // Si ya hay una pieza seleccionada e intentamos mover
+        if (moveFrom) {
+            const result = makeMove({ from: moveFrom, to: square, promotion: 'q' });
+            if (result) {
+                setMoveFrom('');
+                setOptionSquares({});
+                return;
+            }
+        }
+
+        // Si no hay selección o el movimiento fue inválido, intentar seleccionar nueva pieza
+        const moves = game.moves({ square, verbose: true });
+        if (moves.length > 0) {
+            setMoveFrom(square);
+            const newSquares = {};
+            moves.forEach((m) => {
+                newSquares[m.to] = {
+                    background: game.get(m.to) ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)' : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
+                    borderRadius: '50%'
+                };
+            });
+            newSquares[square] = { background: 'rgba(255, 255, 0, 0.4)' };
+            setOptionSquares(newSquares);
+        } else {
+            setMoveFrom('');
+            setOptionSquares({});
+        }
     };
 
     return {
-        fen,
+        fen: game.fen(),
         isThinking,
         status,
         gameHistory,
         onDrop,
         onSquareClick,
         optionSquares,
-        resetGame,
-        undoMove,
+        resetGame: () => {
+            const newGame = new Chess();
+            setGame(newGame);
+            updateStatus(newGame);
+            setMoveFrom('');
+            setOptionSquares({});
+        },
+        undoMove: () => {
+            if (gameHistory.length < 2) return;
+            const g = new Chess(game.fen());
+            g.undo(); g.undo();
+            setGame(g);
+            updateStatus(g);
+        },
         isGameOver: game.isGameOver()
     };
 }
