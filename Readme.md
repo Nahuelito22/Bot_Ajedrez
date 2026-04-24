@@ -9,7 +9,8 @@ A diferencia de los motores de ajedrez tradicionales como Stockfish que se basan
 * **Modelo Predictivo LSTM:** El núcleo del bot es una red neuronal profunda que analiza secuencias de movimientos para predecir la siguiente jugada.
 * **Entrenamiento de Alta Calidad:** Entrenado sobre un corpus masivo y filtrado de partidas de grandes maestros y jugadores titulados.
 * **API para Jugabilidad:** El modelo se expondrá a través de una API RESTful para facilitar la integración con diferentes interfaces.
-* **Interfaz Web (En Desarrollo):** El objetivo final es crear una interfaz web donde se pueda jugar directamente contra el bot.
+* **Interfaz Web V2 (React):** Una interfaz de usuario moderna y premium con soporte para temas, gestión de tiempos y una experiencia de juego fluida.
+* **Dashboard de Análisis de IA:** Visualización interactiva en tiempo real del modelo LSTM, mostrando las 10 mejores predicciones y métricas de inferencia.
 
 
 
@@ -17,17 +18,17 @@ A diferencia de los motores de ajedrez tradicionales como Stockfish que se basan
 
 El proyecto está diseñado con una arquitectura moderna de tres componentes principales:
 
-1.  **Modelo de IA (`model.py`):** La red neuronal construida con TensorFlow/Keras que constituye el cerebro del bot.
-2.  **Backend (`main.py`):** Un servidor web construido con **FastAPI** que carga el modelo entrenado y expone un endpoint (ej. `/move`) para recibir una posición y devolver la jugada del bot.
-3.  **Frontend (`index.html`, etc.):** Una interfaz de usuario interactiva en el navegador, desarrollada con **HTML, CSS y JavaScript**, utilizando librerías como `Chess.js` y `Chessboard.js` para la lógica y visualización del tablero.
+1.  **Modelo de IA (`model.py`):** La red neuronal construida con TensorFlow/Keras que constituye el cerebro del bot (3.48M parámetros).
+2.  **Backend (`main.py`):** Un servidor web construido con **FastAPI** desplegado en Hugging Face que expone el modelo mediante una API RESTful.
+3.  **Frontend V2 (`frontend-v2`):** Una aplicación de alto rendimiento construida con **React + Vite**, utilizando `Chess.js` para la lógica y `react-chessboard` para la visualización, con un sistema de diseño basado en Glassmorphism.
 
 ## 🛠️ Stack Tecnológico
 
-* **Backend:** Python 3.11, FastAPI
+* **Backend:** Python 3.11, FastAPI (Desplegado en Hugging Face Spaces)
 * **Machine Learning:** TensorFlow, Keras, NumPy, Scikit-learn
-* **Manejo de Lógica de Ajedrez:** `python-chess`
+* **Manejo de Lógica de Ajedrez:** `python-chess` / `chess.js`
 * **Entorno:** JupyterLab, Google Colab (para entrenamiento con GPU)
-* **Frontend (planeado):** JavaScript, Chess.js, Chessboard.js
+* **Frontend:** React 18, Vite, Framer Motion (animaciones), Lucide React (iconos)
 
 ## 🚀 Instalación y Configuración Local
 
