@@ -14,8 +14,9 @@ const LAYOUT_CONFIG = {
     player1Clock: { width: '210px', height: '50px', marginBottom: '25px' },
     player1Info: { width: '210px', height: '130px' },
     board: { width: '500px', maxWidth: '600px' },
-    statusCard: { width: '240px', minHeight: '150px' },
+    statusCard: { width: '240px', minHeight: '130px' },
     controlsCard: { width: '240px', minHeight: '250px' },
+    controlTitleMarginTop: '-5px', // Ajusta este valor para mover el texto "Controles" hacia arriba o abajo
     historyCard: { width: '190px', height: '450px' },
     gapBetweenColumns: '10px'
 };
@@ -178,7 +179,7 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                     </div>
 
                     <div className="controls-box glass-card" style={{ width: LAYOUT_CONFIG.controlsCard.width, minHeight: LAYOUT_CONFIG.controlsCard.minHeight, margin: 0 }}>
-                        <h3 style={{ marginBottom: '20px' }}>Controles</h3>
+                        <h3 style={{ marginBottom: '20px', marginTop: LAYOUT_CONFIG.controlTitleMarginTop }}>Controles</h3>
                         <div className="controls-layout">
                             <button onClick={resetGame} className="action-btn primary-action-btn">
                                 <RotateCcw size={22} /> Nueva Partida
