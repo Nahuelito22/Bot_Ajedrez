@@ -178,24 +178,33 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                     </div>
 
                     <div className="controls-box glass-card" style={{ width: LAYOUT_CONFIG.controlsCard.width, minHeight: LAYOUT_CONFIG.controlsCard.minHeight, margin: 0 }}>
-                        <h3>Controles</h3>
-                        <div className="action-buttons grid-buttons">
-                            <button onClick={toggleGameMode} className="action-btn secondary-btn" style={{ gridColumn: '1 / -1' }}>
-                                {gameMode === 'pvai' ? <Users size={18} /> : <Bot size={18} />}
-                                {gameMode === 'pvai' ? ' Cambiar a JvsJ' : ' Cambiar a JvsIA'}
+                        <h3 style={{ marginBottom: '20px' }}>Controles</h3>
+                        <div className="controls-layout">
+                            <button onClick={resetGame} className="action-btn primary-action-btn">
+                                <RotateCcw size={22} /> Nueva Partida
                             </button>
-                            <button onClick={resetGame} className="action-btn">
-                                <RotateCcw size={18} /> Nueva Partida
-                            </button>
-                            <button onClick={undoMove} disabled={gameHistory.length < 2 || isThinking || (gameMode==='pvp' && gameHistory.length < 1)} className="action-btn">
-                                <Undo2 size={18} /> Deshacer
-                            </button>
-                            <button onClick={() => setIsTimeModalOpen(true)} className="action-btn secondary-btn">
-                                <Clock size={18} /> Tiempos
-                            </button>
-                            <button onClick={onOpenSettings} className="action-btn secondary-btn">
-                                <Settings size={18} /> Ajustes
-                            </button>
+
+                            <div className="secondary-grid">
+                                <button onClick={undoMove} disabled={gameHistory.length < 2 || isThinking || (gameMode==='pvp' && gameHistory.length < 1)} className="action-btn compact-action-btn">
+                                    <Undo2 size={18} />
+                                    <span>Deshacer</span>
+                                </button>
+                                
+                                <button onClick={toggleGameMode} className="action-btn compact-action-btn">
+                                    {gameMode === 'pvai' ? <Users size={18} /> : <Bot size={18} />}
+                                    <span>{gameMode === 'pvai' ? 'J vs J' : 'J vs IA'}</span>
+                                </button>
+
+                                <button onClick={() => setIsTimeModalOpen(true)} className="action-btn compact-action-btn">
+                                    <Clock size={18} />
+                                    <span>Tiempos</span>
+                                </button>
+
+                                <button onClick={onOpenSettings} className="action-btn compact-action-btn">
+                                    <Settings size={18} />
+                                    <span>Ajustes</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

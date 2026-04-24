@@ -134,6 +134,62 @@ body.body-no-scroll { overflow: hidden; }
     gap: 10px;
 }
 
+.controls-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.primary-action-btn {
+    width: 100%;
+    padding: 15px !important;
+    font-size: 1.1em !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.secondary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.compact-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 8px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
+    font-size: 0.75em !important;
+    color: var(--text-color) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.compact-action-btn:hover {
+    background: rgba(207, 177, 104, 0.1) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    transform: translateY(-2px);
+}
+
+.compact-action-btn svg {
+    opacity: 0.8;
+}
+
+.compact-action-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
 .history-column {
     display: flex;
     flex-direction: column;
