@@ -4,6 +4,22 @@ import { RotateCcw, Undo2, Settings, Clock, Copy, User, Bot, Users } from 'lucid
 import { useChessGame } from '../hooks/useChessGame';
 import TimeModal from './TimeModal';
 
+// ==========================================
+// CONFIGURACIÓN DE DISEÑO (LAYOUT)
+// Modifica estos valores para ajustar posiciones y tamaños
+// ==========================================
+const LAYOUT_CONFIG = {
+    player2Info: { width: '210px', height: '130px', marginBottom: '25px' },
+    player2Clock: { width: '210px', height: '50px' },
+    player1Clock: { width: '210px', height: '50px', marginBottom: '25px' },
+    player1Info: { width: '210px', height: '130px' },
+    board: { width: '500px', maxWidth: '600px' },
+    statusCard: { width: '240px', minHeight: '150px' },
+    controlsCard: { width: '240px', minHeight: '250px' },
+    historyCard: { width: '190px', height: '450px' },
+    gapBetweenColumns: '10px'
+};
+
 export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) {
     const {
         fen,
@@ -73,13 +89,23 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
 
     return (
         <section id="jugar" className="main-section">
-            <div className="game-container">
+            <div className="game-container" style={{ 
+                gap: LAYOUT_CONFIG.gapBetweenColumns,
+                display: 'flex',
+                alignItems: 'stretch', // Estirar para que todas las columnas tengan la misma altura base
+                justifyContent: 'center'
+            }}>
                 
                 {/* COLUMNA 1: JUGADORES */}
-                <div className="players-column">
+                <div className="players-column" style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'space-between',
+                    height: boardWidth // La altura de la columna será igual al ancho del tablero (que es cuadrado)
+                }}>
                     {/* SECCIÓN SUPERIOR (IA / JUGADOR 2) */}
-                    <div className="player-section top-player" style={{ display: 'flex', flexDirection: 'column', gap: '26px' }}>
-                        <div className="player-info opponent-info glass-card" style={{ width: '250px', height: '163px' }}>
+                    <div className="player-section top-player" style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+                        <div className="player-info opponent-info glass-card" style={{ width: LAYOUT_CONFIG.player2Info.width, height: LAYOUT_CONFIG.player2Info.height }}>
                             <div className="player-details">
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                     {gameMode === 'pvai' ? <Bot size={20} color="#cfb168"/> : <User size={20} color="#cfb168"/>}
@@ -92,18 +118,18 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                             </div>
                         </div>
                         
-                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'b') ? 'active-clock' : ''}`} style={{ width: '252px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'b') ? 'active-clock' : ''}`} style={{ width: LAYOUT_CONFIG.player2Clock.width, height: LAYOUT_CONFIG.player2Clock.height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {formatTime(blackTime)}
                         </div>
                     </div>
 
                     {/* SECCIÓN INFERIOR (TÚ / JUGADOR 1) */}
-                    <div className="player-section bottom-player" style={{ display: 'flex', flexDirection: 'column', gap: '19px' }}>
-                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'w') ? 'active-clock' : ''}`} style={{ width: '250px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="player-section bottom-player" style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+                        <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'w') ? 'active-clock' : ''}`} style={{ width: LAYOUT_CONFIG.player1Clock.width, height: LAYOUT_CONFIG.player1Clock.height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {formatTime(whiteTime)}
                         </div>
 
-                        <div className="player-info user-info glass-card" style={{ width: '250px', height: '150px' }}>
+                        <div className="player-info user-info glass-card" style={{ width: LAYOUT_CONFIG.player1Info.width, height: LAYOUT_CONFIG.player1Info.height }}>
                             <div className="player-details">
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                                     <User size={20} color="#cfb168"/>
@@ -117,7 +143,7 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
 
                 {/* COLUMNA 2: TABLERO */}
                 <div className="board-column">
-                    <div className="board-wrapper" ref={boardWrapperRef}>
+                    <div className="board-wrapper" ref={boardWrapperRef} style={{ width: LAYOUT_CONFIG.board.width, maxWidth: LAYOUT_CONFIG.board.maxWidth }}>
                         <Chessboard 
                             id="RoqueChessBoard" 
                             position={fen} 
@@ -135,8 +161,13 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                 </div>
 
                 {/* COLUMNA 3: ESTADO Y CONTROLES */}
-                <div className="controls-column">
-                    <div className="status-box glass-card">
+                <div className="controls-column" style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'space-between',
+                    height: boardWidth 
+                }}>
+                    <div className="status-box glass-card" style={{ width: LAYOUT_CONFIG.statusCard.width, minHeight: LAYOUT_CONFIG.statusCard.minHeight, margin: 0 }}>
                         <h3>Estado de la Partida</h3>
                         <p id="gameStatus" className="status-text">{status}</p>
                         <div style={{marginTop: '15px'}}>
@@ -146,7 +177,7 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                         </div>
                     </div>
 
-                    <div className="controls-box glass-card">
+                    <div className="controls-box glass-card" style={{ width: LAYOUT_CONFIG.controlsCard.width, minHeight: LAYOUT_CONFIG.controlsCard.minHeight, margin: 0 }}>
                         <h3>Controles</h3>
                         <div className="action-buttons grid-buttons">
                             <button onClick={toggleGameMode} className="action-btn secondary-btn" style={{ gridColumn: '1 / -1' }}>
@@ -170,8 +201,8 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                 </div>
 
                 {/* COLUMNA 4: HISTORIAL */}
-                <div className="history-column">
-                    <div className="history-box glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div className="history-column" style={{ height: boardWidth }}>
+                    <div className="history-box glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', width: LAYOUT_CONFIG.historyCard.width, margin: 0 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                             <h3 style={{ margin: 0 }}>Historial</h3>
                             <button onClick={handleCopyPGN} className="action-btn secondary-btn" style={{ padding: '6px 12px', fontSize: '0.8em' }}>
