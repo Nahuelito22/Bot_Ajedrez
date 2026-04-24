@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Settings } from 'lucide-react';
 
-export default function Navbar({ activeSection, setActiveSection, onOpenSettings }) {
+export default function Navbar({ activeSection, setActiveSection, appTheme, setAppTheme }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleNavClick = (section) => {
@@ -50,14 +50,31 @@ export default function Navbar({ activeSection, setActiveSection, onOpenSettings
                     </a>
                 </li>
                 <li>
-                    <button 
-                        onClick={onOpenSettings} 
-                        className="action-btn" 
-                        style={{ padding: '8px', marginLeft: '10px', background: 'transparent', boxShadow: 'none', color: 'var(--text-color)' }}
-                        title="Configuración"
+                    <a 
+                        href="https://github.com/Nahuelito22/Bot_Ajedrez" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="nav-link"
                     >
-                        <Settings size={20} />
-                    </button>
+                        Código Fuente
+                    </a>
+                </li>
+                <li>
+                    <div className="theme-switch-wrapper" style={{display: 'flex', alignItems: 'center', marginLeft: '10px'}}>
+                        <label className="theme-switch" htmlFor="checkbox">
+                            <input 
+                                type="checkbox" 
+                                id="checkbox" 
+                                checked={appTheme === 'light'} 
+                                onChange={() => setAppTheme(appTheme === 'dark' ? 'light' : 'dark')}
+                            />
+                            <div className="slider round">
+                                <div className="theme-icon">
+                                    <img src="/chesspieces/wikipedia/wP.png" alt="Theme Icon" style={{width: '20px'}}/>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
                 </li>
             </ul>
         </nav>
