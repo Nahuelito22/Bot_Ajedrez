@@ -131,6 +131,14 @@ export function useChessGame() {
         return () => clearInterval(interval);
     }, [isTimerRunning, timeControl, fen, whiteTime, blackTime]);
 
+    // Sincronizar relojes cuando cambia el control de tiempo
+    useEffect(() => {
+        const startTime = timeControl === 'unlimited' ? 600 : parseInt(timeControl);
+        setWhiteTime(startTime);
+        setBlackTime(startTime);
+        setIsTimerRunning(false);
+    }, [timeControl]);
+
     const onDrop = (sourceSquare, targetSquare) => {
         if ((gameMode === 'pvai' && game.turn() === 'b') || isThinking || whiteTime === 0 || blackTime === 0) return false;
 
@@ -183,6 +191,9 @@ export function useChessGame() {
     const resetGame = () => {
         game.reset();
         setIsTimerRunning(false);
+        const startTime = timeControl === 'unlimited' ? 600 : parseInt(timeControl);
+        setWhiteTime(startTime);
+        setBlackTime(startTime);
         updateUI();
         setMoveFrom('');
         setOptionSquares({});
