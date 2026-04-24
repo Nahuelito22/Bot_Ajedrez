@@ -371,4 +371,15 @@ input:checked + .slider:before {
 
 input:checked + .slider .theme-icon {
     left: 34px;
-}
+}@import url(" https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\);
+
+.clickable-card { cursor: pointer; transition: transform 0.3s ease; }
+.clickable-card:hover { transform: translateY(-5px); }
+.chart-wrapper { position: relative; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
+.chart-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(207, 177, 104, 0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; color: white; font-weight: 600; }
+.clickable-card:hover .chart-overlay { opacity: 1; }
+#chartModal .modal-content { max-width: 900px; padding: 2rem; border: 1px solid var(--accent-color); }
+.close-modal { position: absolute; right: 20px; top: 10px; font-size: 2rem; color: var(--text-color); cursor: pointer; }
+.modal-body { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+.modal-body img { max-width: 100%; border-radius: 8px; }
+.modal-body p { font-size: 1.1rem; text-align: center; color: var(--text-color); line-height: 1.6; }

@@ -85,17 +85,47 @@ body.body-no-scroll { overflow: hidden; }
 .hamburger-menu { display: none; }
 
 /* CONTENIDO PRINCIPAL Y SPA */
-.main-section { padding: 40px 5%; min-height: 80vh; display: flex; justify-content: center; align-items: center; animation: fadeIn 0.5s forwards; }
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.main-section { 
+    padding: 20px; 
+    min-height: calc(100vh - var(--nav-height)); 
+    display: flex; 
+    justify-content: center; 
+    align-items: flex-start; 
+    animation: fadeIn 0.5s forwards;
+    overflow-x: hidden;
 }
 
-.game-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; width: 100%; max-width: 1100px; }
-.left-panel { flex: 1.5; min-width: 320px; display: flex; flex-direction: column; gap: 20px; }
-.right-panel { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 20px; }
-.board-wrapper { width: 100%; max-width: 500px; margin: 0 auto; }
+.game-container { 
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 30px; 
+    width: 100%; 
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.board-wrapper { 
+    width: 100%; 
+    aspect-ratio: 1 / 1;
+    max-width: 500px; 
+    position: relative; /* CRÍTICO para el drag and drop */
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.right-panel { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+}
 #miTablero [data-square], #previewBoardPieces [data-square] { position: relative; }
 
 .controls-container { display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px; }

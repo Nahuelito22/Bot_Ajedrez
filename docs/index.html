@@ -7,6 +7,7 @@
     <link rel="icon" type="image/x-icon" href="img/mifavicon.ico">
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
@@ -62,20 +63,38 @@
     <section id="analisis" class="main-section">
         <div class="analysis-container glass-panel">
             <h2 class="section-title">Análisis del Modelo</h2>
+            
+            <div class="analysis-intro fade-up-element" style="margin-bottom: 2rem; color: var(--text-color); opacity: 0.9; line-height: 1.6;">
+                <p>El desempeño de <strong>Roque Chess</strong> ha sido validado mediante un riguroso análisis cuantitativo. El modelo, basado en una arquitectura de Red Neuronal Recurrente (LSTM), fue entrenado con un dataset de <strong>1 millón de partidas</strong> de jugadores de alto nivel (2000+ ELO).</p>
+                <p>Para evaluar su fuerza real, se organizó un <strong>Torneo Gauntlet de 700 partidas</strong> contra diferentes niveles del motor Stockfish. Los siguientes gráficos detallan cómo el bot aplica su "intuición" aprendida en comparación con el cálculo algorítmico tradicional.</p>
+            </div>
+
             <div class="dashboard-grid">
-                <div class="chart-container glass-card">
+                <div class="chart-container glass-card clickable-card fade-up-element" onclick="openChartModal('img/grafico_de_rendimiento.png', 'Rendimiento Promedio', 'Evolución del desempeño del bot en las diferentes etapas de la partida (Apertura, Medio Juego, Final).')">
                     <div class="chart-header">
                         <h3>Rendimiento Promedio</h3>
                     </div>
-                    <img src="img/grafico_de_rendimiento.png" alt="Gráfico de Rendimiento Promedio">
-                    <p class="chart-description">Evolución del desempeño del bot en las diferentes etapas de la partida (Apertura, Medio Juego, Final).</p>
+                    <div class="chart-wrapper">
+                        <img src="img/grafico_de_rendimiento.png" alt="Gráfico de Rendimiento Promedio">
+                        <div class="chart-overlay">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            <span>Ver más</span>
+                        </div>
+                    </div>
+                    <p class="chart-description">Evolución del desempeño del bot en las diferentes etapas de la partida.</p>
                 </div>
-                <div class="chart-container glass-card">
+                <div class="chart-container glass-card clickable-card fade-up-element" style="animation-delay: 0.1s;" onclick="openChartModal('img/grafico_de_errores.png', 'Calidad Táctica', 'Análisis de la pérdida de centipeones. Refleja la precisión del modelo en comparación con los motores tradicionales.')">
                     <div class="chart-header">
                         <h3>Calidad Táctica</h3>
                     </div>
-                    <img src="img/grafico_de_errores.png" alt="Gráfico de Pérdida de Centipeones">
-                    <p class="chart-description">Análisis de la pérdida de centipeones. Refleja la precisión del modelo en comparación con los motores tradicionales.</p>
+                    <div class="chart-wrapper">
+                        <img src="img/grafico_de_errores.png" alt="Gráfico de Pérdida de Centipeones">
+                        <div class="chart-overlay">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                            <span>Ver más</span>
+                        </div>
+                    </div>
+                    <p class="chart-description">Análisis de la precisión del modelo respecto a centipeones perdidos.</p>
                 </div>
             </div>
         </div>
@@ -219,6 +238,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.min.js"></script>
 
     <!-- config must be loaded before main script -->
+    <!-- Modal para Gráficos -->
+    <div id="chartModal" class="modal">
+        <div class="modal-content glass-card fade-in">
+            <span class="close-modal" onclick="closeChartModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div class="modal-body">
+                <img id="modalImg" src="" alt="Gráfico Expandido">
+                <p id="modalDesc"></p>
+            </div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
     <script src="script.js"></script>
 </body>

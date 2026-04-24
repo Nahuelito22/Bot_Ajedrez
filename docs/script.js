@@ -480,3 +480,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // INICIALIZACIÓN
     startNewGame();
 });
+
+// Funciones globales para el Modal de Gráficos
+function openChartModal(imgSrc, title, description) {
+    const modal = document.getElementById('chartModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+
+    modalImg.src = imgSrc;
+    modalTitle.innerText = title;
+    modalDesc.innerText = description;
+    
+    modal.style.display = "block";
+    document.body.style.overflow = "hidden"; // Desactivar scroll
+}
+
+function closeChartModal() {
+    const modal = document.getElementById('chartModal');
+    modal.style.display = "none";
+    document.body.style.overflow = "auto"; // Reactivar scroll
+}
+
+// Cerrar modal al hacer clic fuera del contenido
+window.onclick = function(event) {
+    const modal = document.getElementById('chartModal');
+    if (event.target == modal) {
+        closeChartModal();
+    }
+}

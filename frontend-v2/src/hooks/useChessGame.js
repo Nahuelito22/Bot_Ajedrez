@@ -1,45 +1,50 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Chess } from 'chess.js';
 
 export function useChessGame() {
-    const [game, setGame] = useState(new Chess());
+    // Instancia única y persistente del motor de ajedrez
+    const game = useMemo(() => new Chess(), []);
+    
+    // Estados para la UI
+    const [fen, setFen] = useState(game.fen());
     const [isThinking, setIsThinking] = useState(false);
     const [status, setStatus] = useState('Turno de las blancas');
     const [gameHistory, setGameHistory] = useState([]);
+    const [optionSquares, setOptionSquares] = useState({});
+    const [moveFrom, setMoveFrom] = useState('');
 
-    const updateStatus = useCallback((currentGame) => {
+    const updateUI = useCallback(() => {
+        setFen(game.fen());
+        setGameHistory(game.history());
+        
         let statusText = '';
-        let moveColor = currentGame.turn() === 'b' ? 'negras' : 'blancas';
+        let moveColor = game.turn() === 'b' ? 'negras' : 'blancas';
 
-        if (currentGame.isCheckmate()) {
+        if (game.isCheckmate()) {
             statusText = `Juego terminado, ganan las ${moveColor === 'blancas' ? 'negras' : 'blancas'} por Jaque Mate.`;
-        } else if (currentGame.isDraw()) {
+        } else if (game.isDraw()) {
             statusText = 'Juego terminado en tablas.';
         } else {
             statusText = `Turno de las ${moveColor}`;
-            if (currentGame.isCheck()) {
+            if (game.isCheck()) {
                 statusText += `, las ${moveColor} están en Jaque.`;
             }
         }
         setStatus(statusText);
-        setGameHistory(currentGame.history());
-    }, []);
+    }, [game]);
 
     const makeMove = useCallback((move) => {
         try {
-            const gameCopy = new Chess(game.fen());
-            const result = gameCopy.move(move);
+            const result = game.move(move);
             if (result) {
-                setGame(gameCopy);
-                updateStatus(gameCopy);
+                updateUI();
                 return true;
             }
         } catch (e) {
-            console.warn("Movimiento inválido:", e.message);
-            return false;
+            console.warn("Movimiento inválido detectado:", e.message);
         }
         return false;
-    }, [game, updateStatus]);
+    }, [game, updateUI]);
 
     const getAiMove = useCallback(async () => {
         if (game.isGameOver() || game.turn() === 'w') return;
@@ -59,7 +64,6 @@ export function useChessGame() {
 
             const data = await response.json();
             if (data && data.best_move) {
-                // El bot devuelve el movimiento en formato SAN o objeto, makeMove lo maneja
                 makeMove(data.best_move);
             }
         } catch (error) {
@@ -77,31 +81,27 @@ export function useChessGame() {
         }
     }, [game, isThinking, getAiMove]);
 
-    // Lógica de interacción
-    const [moveFrom, setMoveFrom] = useState('');
-    const [optionSquares, setOptionSquares] = useState({});
-
     const onDrop = (sourceSquare, targetSquare) => {
         if (game.turn() === 'b' || isThinking) return false;
 
-        const move = {
+        const result = makeMove({
             from: sourceSquare,
             to: targetSquare,
             promotion: 'q'
-        };
+        });
 
-        const result = makeMove(move);
         if (result) {
             setMoveFrom('');
             setOptionSquares({});
+            return true;
         }
-        return result;
+        return false;
     };
 
     const onSquareClick = (square) => {
         if (game.turn() === 'b' || isThinking) return;
 
-        // Si ya hay una pieza seleccionada e intentamos mover
+        // Intentar mover si ya hay una pieza seleccionada
         if (moveFrom) {
             const result = makeMove({ from: moveFrom, to: square, promotion: 'q' });
             if (result) {
@@ -111,7 +111,7 @@ export function useChessGame() {
             }
         }
 
-        // Si no hay selección o el movimiento fue inválido, intentar seleccionar nueva pieza
+        // Selección de pieza y visualización de opciones
         const moves = game.moves({ square, verbose: true });
         if (moves.length > 0) {
             setMoveFrom(square);
@@ -130,28 +130,32 @@ export function useChessGame() {
         }
     };
 
+    const resetGame = () => {
+        game.reset();
+        updateUI();
+        setMoveFrom('');
+        setOptionSquares({});
+    };
+
+    const undoMove = () => {
+        if (game.history().length < 2) return;
+        game.undo();
+        game.undo();
+        updateUI();
+        setMoveFrom('');
+        setOptionSquares({});
+    };
+
     return {
-        fen: game.fen(),
+        fen,
         isThinking,
         status,
         gameHistory,
         onDrop,
         onSquareClick,
         optionSquares,
-        resetGame: () => {
-            const newGame = new Chess();
-            setGame(newGame);
-            updateStatus(newGame);
-            setMoveFrom('');
-            setOptionSquares({});
-        },
-        undoMove: () => {
-            if (gameHistory.length < 2) return;
-            const g = new Chess(game.fen());
-            g.undo(); g.undo();
-            setGame(g);
-            updateStatus(g);
-        },
+        resetGame,
+        undoMove,
         isGameOver: game.isGameOver()
     };
 }

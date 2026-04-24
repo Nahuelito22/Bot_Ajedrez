@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { RotateCcw, Undo2 } from 'lucide-react';
 import { useChessGame } from '../hooks/useChessGame';
@@ -14,6 +15,21 @@ export default function GameSection({ boardTheme }) {
         resetGame,
         undoMove
     } = useChessGame();
+
+    const [boardWidth, setBoardWidth] = useState(480);
+    const boardWrapperRef = useRef();
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (boardWrapperRef.current) {
+                setBoardWidth(boardWrapperRef.current.offsetWidth);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Colores por defecto si no hay tema seleccionado
     const lightSquareStyle = boardTheme ? { backgroundColor: boardTheme.light } : { backgroundColor: '#f0d9b5' };
@@ -33,9 +49,9 @@ export default function GameSection({ boardTheme }) {
                         </div>
                     </div>
 
-                    <div className="board-wrapper">
+                    <div className="board-wrapper" ref={boardWrapperRef}>
                         <Chessboard 
-                            id="BasicBoard" 
+                            id="RoqueChessBoard" 
                             position={fen} 
                             onPieceDrop={onDrop}
                             onSquareClick={onSquareClick}
@@ -44,6 +60,7 @@ export default function GameSection({ boardTheme }) {
                             customDarkSquareStyle={darkSquareStyle}
                             customLightSquareStyle={lightSquareStyle}
                             animationDuration={200}
+                            boardWidth={boardWidth}
                         />
                     </div>
 
