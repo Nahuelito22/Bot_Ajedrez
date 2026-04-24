@@ -80,7 +80,7 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
         <section id="jugar" className="main-section">
             <div className="game-container">
                 
-                <div className="left-panel">
+                <div className="players-column">
                     <div className="player-info opponent-info glass-card">
                         <div className="avatar opponent-avatar">
                             {gameMode === 'pvai' ? <Bot size={24} color="#cfb168"/> : <User size={24} color="#cfb168"/>}
@@ -93,22 +93,6 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                         <div className={`clock-display ${isTimerRunning && (fen.split(' ')[1] === 'b') ? 'active-clock' : ''}`}>
                             {formatTime(blackTime)}
                         </div>
-                    </div>
-
-                    <div className="board-wrapper" ref={boardWrapperRef}>
-                        <Chessboard 
-                            id="RoqueChessBoard" 
-                            position={fen} 
-                            onPieceDrop={onDrop}
-                            onSquareClick={onSquareClick}
-                            customSquareStyles={optionSquares}
-                            boardOrientation="white"
-                            customDarkSquareStyle={darkSquareStyle}
-                            customLightSquareStyle={lightSquareStyle}
-                            customPieces={pieceTheme ? customPieces : undefined}
-                            animationDuration={200}
-                            boardWidth={boardWidth}
-                        />
                     </div>
 
                     <div className="player-info user-info glass-card">
@@ -125,7 +109,25 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                     </div>
                 </div>
 
-                <div className="right-panel">
+                <div className="board-column">
+                    <div className="board-wrapper" ref={boardWrapperRef}>
+                        <Chessboard 
+                            id="RoqueChessBoard" 
+                            position={fen} 
+                            onPieceDrop={onDrop}
+                            onSquareClick={onSquareClick}
+                            customSquareStyles={optionSquares}
+                            boardOrientation="white"
+                            customDarkSquareStyle={darkSquareStyle}
+                            customLightSquareStyle={lightSquareStyle}
+                            customPieces={pieceTheme ? customPieces : undefined}
+                            animationDuration={200}
+                            boardWidth={boardWidth}
+                        />
+                    </div>
+                </div>
+
+                <div className="controls-column">
                     <div className="status-box glass-card">
                         <h3>Estado de la Partida</h3>
                         <p id="gameStatus" className="status-text">{status}</p>
@@ -155,9 +157,20 @@ export default function GameSection({ boardTheme, pieceTheme, onOpenSettings }) 
                             <button onClick={onOpenSettings} className="action-btn secondary-btn">
                                 <Settings size={18} /> Ajustes
                             </button>
-                            <button onClick={handleCopyPGN} className="action-btn secondary-btn">
-                                <Copy size={18} /> Copiar PGN
+                        </div>
+                    </div>
+                </div>
+
+                <div className="history-column">
+                    <div className="history-box glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                            <h3 style={{ margin: 0 }}>Historial</h3>
+                            <button onClick={handleCopyPGN} className="action-btn secondary-btn" style={{ padding: '6px 12px', fontSize: '0.8em' }}>
+                                <Copy size={14} /> PGN
                             </button>
+                        </div>
+                        <div id="pgn" className="pgn-container" style={{ flexGrow: 1, overflowY: 'auto', fontFamily: 'monospace', fontSize: '0.9em', lineHeight: '1.5', paddingRight: '5px' }}>
+                            {getPGN() || 'Aún no hay movimientos.'}
                         </div>
                     </div>
                 </div>

@@ -95,18 +95,25 @@ body.body-no-scroll { overflow: hidden; }
 
 .game-container { 
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 30px; 
+    grid-template-columns: 250px minmax(400px, 500px) 250px 250px;
+    gap: 20px; 
     width: 100%; 
-    max-width: 1000px;
+    max-width: 1400px;
     margin: 0 auto;
+    justify-content: center;
 }
 
-.left-panel {
+.players-column {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
     gap: 20px;
+}
+
+.board-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .board-wrapper { 
@@ -115,14 +122,39 @@ body.body-no-scroll { overflow: hidden; }
     position: relative;
 }
 
-.right-panel { 
+.controls-column { 
     display: flex; 
     flex-direction: column; 
     gap: 20px; 
 }
-#miTablero [data-square], #previewBoardPieces [data-square] { position: relative; }
 
-.controls-container { display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px; }
+.history-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (max-width: 1300px) {
+    .game-container {
+        grid-template-columns: 250px minmax(350px, 500px) 250px;
+    }
+    .history-column {
+        grid-column: 1 / -1;
+        flex-direction: row;
+    }
+}
+
+@media (max-width: 900px) {
+    .game-container {
+        grid-template-columns: 1fr;
+    }
+    .players-column {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+}
+
+#miTablero [data-square], #previewBoardPieces [data-square] { position: relative; }
 
 .clock-display {
     font-family: monospace;
