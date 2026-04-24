@@ -80,14 +80,28 @@ export function useChessGame() {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fen: game.fen() })
+                body: JSON.stringify({ moves: game.history() })
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const data = await response.json();
-            if (data && data.best_move) {
-                makeMove(data.best_move);
+            const botMoves = data.bot_moves || [];
+            let moveMade = false;
+
+            for (const move of botMoves) {
+                if (makeMove(move)) {
+                    moveMade = true;
+                    break;
+                }
+            }
+
+            if (!moveMade) {
+                const possibleMoves = game.moves();
+                if (possibleMoves.length > 0) {
+                    const randomIdx = Math.floor(Math.random() * possibleMoves.length);
+                    makeMove(possibleMoves[randomIdx]);
+                }
             }
         } catch (error) {
             console.error("Error al obtener jugada del bot:", error);
